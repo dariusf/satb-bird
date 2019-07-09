@@ -3,17 +3,19 @@ $(document).ready(function () {
   'use strict';
 
   var baseFreq = 440;
-  var currentNoteIndex = 57; // A4
+  window.currentNoteIndex = 39; // A4
+  // 26-50 is D2 to D4
   var isRefSoundPlaying = false;
   var isMicrophoneInUse = false;
   var frameId,
-    freqTable,
+    // freqTable,
     // gauge,
     micStream,
     notesArray,
     audioContext,
     sourceAudioNode,
     analyserAudioNode;
+  window.freqTable = null;
 
   var isAudioContextSupported = function () {
     // This feature is still prefixed in Safari
@@ -281,6 +283,9 @@ $(document).ready(function () {
       isRefSoundPlaying = true;
     } else {
       turnOffReferenceSound();
+      // D2 to D4
+      var low = 35;
+      currentNoteIndex = Math.floor(Math.random() * (50-low)) + low;
     }
   };
 
