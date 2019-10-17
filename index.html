@@ -1,36 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>SATB Bird</title>
-</head>
-<body>
-	<canvas id="flappy" width="500" height="512"></canvas>
-	<br/><br/>
-	<script src = "https://code.jquery.com/jquery-2.1.3.min.js"></script>
-	<script src = "util.js"></script>
-	<script src = "tuner.js"></script>
-	<script src = "score.js"></script>
+  <head>
+    <title>SATB Bird</title>
+    <meta charset="utf-8" />
+  </head>
 
-	<!-- <script src = "https://bernii.github.io/gauge.js/dist/gauge.min.js"></script> -->
-	<script src = "game.js"></script>
+  <body>
+    <canvas id="flappy" width="500" height="512"></canvas>
+    <div id="app"></div>
+    <br /><br />
 
-	<!-- A -->
-	<!-- <span id="pitch">-- Hz</span> -->
-	<span id="note">--</span>
-	<!-- <span id="cents"></span> -->
-	<br />
-	<a id="micButton" href="#">enable mic</a>
-	<br />
-	<a id="refButton" href="#">play tone</a>
-	<a id="refDecreaseNoteButton" href="#">lower</a>
-	<a id="refIncreaseNoteButton" href="#">higher</a>
-	<!-- <a id="noPipes" href="#">no pipes</a> -->
-	<br /><br />
-	<label for="scoreFile">open a musicxml file</label>
-	<input id="scoreFile" type="file" onchange="readUploadedScore()"> or
-	<br />
-	<a href="#" onclick="loadScore('https://raw.githubusercontent.com/opensheetmusicdisplay/opensheetmusicdisplay/develop/test/data/Land_der_Berge.musicxml').then(startGame)">load some score</a> or
-	<br />
-	<a href="#" onclick="DEFAULT_RANDOM_PIPES = true; startGame()">play a random level</a>
-</body>
+    <script src="https://unpkg.com/ml5@0.3.1/dist/ml5.min.js"></script>
+    <!-- <script src="https://unpkg.com/@tonejs/midi@2.0.7"></script> -->
+    <script src="https://unpkg.com/@tonejs/midi@2.0.7/build/Midi.js"></script>
+
+    <!-- production.min.js -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+    <script src="https://unpkg.com/@material-ui/core@4.4.0/umd/material-ui.development.js" crossorigin></script>
+    <!-- material-ui.production.js" -->
+
+    <script src="util.js"></script>
+    <script type="module" src="shaped.js"></script>
+    <script type="module" src="app.js"></script>
+
+    <script type="module" src="oscillator.js"></script>
+    <script type="module" src="autocorrelation.js"></script>
+
+    <script type="module" src="score.js"></script>
+
+    <!-- <script src = "https://bernii.github.io/gauge.js/dist/gauge.min.js"></script> -->
+    <script type="module" src="game.js"></script>
+
+    <script type="module">
+      import Game from './game.js';
+      import Score from './score.js';
+    </script>
+  </body>
 </html>

@@ -1,3 +1,12 @@
+function isAudioContextSupported() {
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  return !!window.AudioContext;
+}
+
+function isGetUserMediaSupported() {
+  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  return (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || navigator.getUserMedia;
+}
 
 // for consuming XPathResults fully
 function iterate(i, f) {
@@ -46,6 +55,4 @@ function rotate(n, a) {
   });
 
   window.notePositions = notePositions;
-
 })();
-
