@@ -4,6 +4,7 @@ import Game from './game.js';
 import PlayTone from './oscillator.js';
 import Score from './score.js';
 import PitchDetection from './autocorrelation.js';
+import Midi from './midi.js';
 import { shaped, or } from './shaped.js';
 
 const html = htm.bind(React.createElement);
@@ -51,7 +52,7 @@ function FilePicker(props) {
   return html`
     <span>
       <input
-        accept=".musicxml,.xml"
+        accept=".musicxml,.xml,.mid,.midi"
         className=${classes.filePicker}
         id="contained-button-file"
         onChange=${e => props.onChange(e.target.files[0])}
@@ -106,6 +107,7 @@ class App extends React.Component {
       data: null, // checkScore
       url: null, // the url in the ui
       view: 0 // file, url in that order
+      // TODO consider moving this ui state somewhere else
     },
     mic: {
       enabled: false,
@@ -168,7 +170,24 @@ class App extends React.Component {
   }
 
   loadScore(file) {
-    Score.readFile(file);
+    if (!file) return;
+    if (file.name.endsWith('.mid') || file.name.endsWith('.midi')) {
+      Midi.readFile(file);
+    } else {
+      Score.readFile(file);
+    }
+  }
+
+  playScore() {
+    // TODO check if a score is loaded
+    // TODO what happens for musicxml?
+    Midi.play();
+  }
+
+  stopScore(file) {
+    // TODO check if a score is loaded
+    // TODO what happens for musicxml?
+    Midi.stop();
   }
 
   toggleMic() {
@@ -312,6 +331,9 @@ class App extends React.Component {
                 <${Button} onClick=${this.urlLoad.bind(this)} text="load" />
               </div>
             `}
+
+          <${Button} onClick=${this.playScore.bind(this)} text="play" />
+          <${Button} onClick=${this.stopScore.bind(this)} text="stop" />
         </fieldset>
       </div>
     `;
