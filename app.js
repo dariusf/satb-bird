@@ -104,7 +104,8 @@ class App extends React.Component {
     },
     score: {
       data: null, // checkScore
-      url: null // the url in the ui
+      url: null, // the url in the ui
+      view: 0 // file, url in that order
     },
     mic: {
       enabled: false,
@@ -287,12 +288,30 @@ class App extends React.Component {
 
         <fieldset style=${{ display: 'inline' }}>
           <legend>Score</legend>
-          <${FilePicker} onChange=${this.loadScore.bind(this)} />
+
+          <${MaterialUI.Paper}>
+            <${MaterialUI.Tabs}
+            indicatorColor="primary"
+            onChange=${(_e, n) => this.setState(produce(s => (s.score.view = n)))} value=${this.state.score.view}>
+              <${MaterialUI.Tab} label="File" />
+              <${MaterialUI.Tab} label="URL" />
+            </${MaterialUI.Tabs}>
+          </${MaterialUI.Paper}>
+
+          ${this.state.score.view === 0 &&
+            html`
+              <${FilePicker} onChange=${this.loadScore.bind(this)} />
+            `}
           <!--
           https://raw.githubusercontent.com/opensheetmusicdisplay/opensheetmusicdisplay/develop/test/data/Land_der_Berge.musicxml
           -->
-          <${Field} label="url" onChange=${this.urlInput.bind(this)} />
-          <${Button} onClick=${this.urlLoad.bind(this)} text="load" />
+          ${this.state.score.view === 1 &&
+            html`
+              <div>
+                <${Field} label="url" onChange=${this.urlInput.bind(this)} />
+                <${Button} onClick=${this.urlLoad.bind(this)} text="load" />
+              </div>
+            `}
         </fieldset>
       </div>
     `;
