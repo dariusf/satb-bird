@@ -127,7 +127,7 @@ class App extends React.Component {
     super(props);
     Score.init(score => {
       checkScore(score);
-      this.setState(produce(s => (s.score = score)));
+      this.setState(produce(s => (s.score.data = score)));
     });
   }
 
