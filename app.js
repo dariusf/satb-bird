@@ -8,7 +8,8 @@ let Play = (function () {
   function playNote(audioCtx, freq, time, dur) {
     oscillator = audioCtx.createOscillator();
     gain = audioCtx.createGain();
-    oscillator.type = 'sine';
+    // oscillator.type = 'sine';
+    oscillator.type = 'saw';
     oscillator.connect(gain);
     oscillator.frequency.value = freq;
     gain.connect(audioCtx.destination);
@@ -93,7 +94,28 @@ async function startGame(btn) {
 
   // await PitchDetection.start();
 
-  let bird_delay = gameStart({ randomPipes: false, part });
+  let app = document.querySelector('#app');
+  let canvas = document.querySelector('#flappy');
+  let title = document.querySelector('#title-text').parentNode;
+  // console.log(app, canvas);
+
+  let bird_delay = gameStart({
+    randomPipes: false,
+    part,
+    onStart() {
+      app.style.display = 'none';
+      title.style.display = 'none';
+      // this also has the side effect that scroll bars are hidden
+      canvas.style.display = 'block';
+    },
+    onEnd() {
+      // app.style.display = 'block';
+      app.style.removeProperty('display');
+      title.style.removeProperty('display');
+      // title.style.display = 'block';
+      canvas.style.display = 'none';
+    },
+  });
   Play.part(score, btn.dataset.part, bird_delay);
 }
 //       PitchDetection.stop();

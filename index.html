@@ -3,31 +3,61 @@
   <head>
     <title>SATB Bird</title>
     <meta charset="utf-8" />
+
+    <style>
+      /* https://github.com/system-fonts/modern-font-stacks */
+      #title-text {
+        font-family: ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT',
+          'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif;
+        font-size: 35px;
+      }
+
+      #title-text path {
+        fill: transparent;
+      }
+
+      .container {
+        display: grid;
+        justify-content: center;
+      }
+    </style>
   </head>
 
   <body style="margin: 0; padding: 0">
-    <canvas id="flappy" style="display: block" width="512" height="512"></canvas>
-    <div id="app">
-      <fieldset style="display: inline">
-        <legend>Game</legend>
-        <input accept=".musicxml,.xml,.mid,.midi" onChange="loadScore(this)" type="file" />
-        <br />
-        <div id="part-loaded"></div>
-        <template id="part-container">
-          <fieldset>
-            <legend></legend>
-          </fieldset>
-        </template>
-        <template id="part-player">
-          <div>
-            <div style="display: inline-block">
-              <div class="name"></div>
-              <div class="info"></div>
+    <div class="container">
+      <div style="height: 100px; width: 500px">
+        <svg style="max-width: 100%; max-height: 100%" id="title-text" viewBox="0 0 500 100">
+          <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
+          <text width="500">
+            <textPath startOffset="28%" xlink:href="#curve">SATB Bird</textPath>
+          </text>
+        </svg>
+      </div>
+      <canvas id="flappy" style="display: none"></canvas>
+      <div class="container" id="app">
+        <fieldset style="display: inline">
+          <legend>Game</legend>
+          <input accept=".musicxml,.xml,.mid,.midi" onChange="loadScore(this)" type="file" />
+          <br />
+          <div id="part-loaded"></div>
+          <template id="part-container">
+            <fieldset>
+              <legend></legend>
+            </fieldset>
+          </template>
+          <template id="part-player">
+            <div>
+              <div style="display: inline-block">
+                <div class="name"></div>
+                <div class="info"></div>
+              </div>
+              <button style="margin-left: 50px; vertical-align: top" data-part="" onclick="startGame(this)">
+                play
+              </button>
             </div>
-            <button style="margin-left: 50px; vertical-align: top" data-part="" onclick="startGame(this)">play</button>
-          </div>
-        </template>
-      </fieldset>
+          </template>
+        </fieldset>
+      </div>
     </div>
 
     <!-- <script type="text/javascript" src="https://unpkg.com/tone@13.8.25/build/Tone.js"></script> -->

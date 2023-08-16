@@ -2,10 +2,13 @@ let { gameStart, handleInput } = (function () {
   var NO_PIPES = false;
   var INVULNERABLE = true;
   var DEFAULT_RANDOM_PIPES = false;
+  var ON_END = () => {};
+  var ON_START = () => {};
 
   let PART;
   const PIPE_SPEED = 5;
   const BIRD_X = 80;
+  const BREATHING_TIME = 5;
 
   // TODO
   let flappyNote = 6;
@@ -13,7 +16,6 @@ let { gameStart, handleInput } = (function () {
 
   // why is this useful? see:
   // https://dbaron.org/log/20100309-faster-timeouts
-  // https://blog.klipse.tech/javascript/2016/10/31/setTimeout-0msec.html
   (function () {
     var timeouts = [];
     var messageName = 'zero-timeout-message';
@@ -158,48 +160,41 @@ let { gameStart, handleInput } = (function () {
   var Game = function () {
     this.pipes = [];
     this.birds = [];
-    this.score = 0;
     this.canvas = document.querySelector('#flappy');
-    // this shows scroll bars
-    // this.canvas.width = Math.min(2048, window.innerWidth);
+
+    // make the canvas full screen
     this.canvas.width = Math.min(2048, document.body.clientWidth);
+    this.canvas.height = Math.min(512, document.body.clientHeight);
+
     this.ctx = this.canvas.getContext('2d');
     this.width = this.canvas.width;
     this.height = this.canvas.height;
-    // this.pipe_vert_padding = 20;
+    ON_START();
 
-    // the amount by which to delay the music
+    // the amount of time in seconds for a pipe spawning at the right edge to reach the bird.
+    // also the amount of time by which to delay the music.
     this.bird_to_right_edge_time = (this.width - BIRD_X) / (PIPE_SPEED * FPS);
 
+    // only used for random pipe mode
     this.spawnInterval = NO_PIPES ? Number.MAX_VALUE : 90;
-    this.interval = 0;
 
-    // this.gen = [];
-    // this.alives = 0;
-    // this.generation = 0;
+    // controls pipe spawns
+    this.timeElapsed = 0;
+
+    // time the game will wait after the last note is passed
+    this.gameEnded = BREATHING_TIME;
+
     this.backgroundSpeed = 0.5;
     this.backgroundx = 0;
-    this.maxScore = 0;
   };
 
   Game.prototype.start = function () {
-    this.interval = NO_PIPES ? 1 : 0;
-    this.score = 0;
+    this.timeElapsed = NO_PIPES ? 1 : 0;
     this.pipes = [];
     this.birds = [];
 
-    // for(var i in this.gen){
-    // 	var b = new Bird();
-    // 	this.birds.push(b)
-    // }
-
     var b = new Bird();
     this.birds.push(b);
-
-    // this.generation++;
-    // this.alives = this.birds.length;
-
-    // score
 
     if (DEFAULT_RANDOM_PIPES) {
       return;
@@ -251,12 +246,12 @@ let { gameStart, handleInput } = (function () {
         let idx = part.range.notes.indexOf(name);
         let y1 = (this.height / part.range.semitones) * idx;
         let y = this.height - y1;
-        console.log(part.range.semitones, part.range.notes, idx);
+        // console.log(part.range.semitones, part.range.notes, idx);
         pipePositions.push({ start, end, y, note: n });
       }
       // time += n.duration;
     }
-    console.log('pipes', pipePositions);
+    // console.log('pipes', pipePositions);
 
     this.pipePositions = pipePositions;
     // TODO time signature may change halfway
@@ -350,30 +345,14 @@ let { gameStart, handleInput } = (function () {
     //   }
     // }
 
-    // flap or sing
+    // flap (or sing)
     for (var pipe in this.birds) {
       if (this.birds[pipe].alive) {
-        // var inputs = [
-        // this.birds[i].y / this.height,
-        // nextHoll
-        // ];
-
-        // var res = this.gen[i].compute(inputs);
-        // if(res > 0.5){
-        // this.birds[i].flap();
-
-        // this.target = this.target || 0;
-        // this.target ++;
-
         this.birds[pipe].sing(this.height);
-        // }
-
         this.birds[pipe].update();
         if (this.birds[pipe].isDead(this.height, this.pipes)) {
           this.birds[pipe].alive = false;
           this.alives--;
-          //console.log(this.alives);
-          // Neuvol.networkScore(this.gen[i], this.score);
           if (this.isItEnd()) {
             this.start();
           }
@@ -391,45 +370,47 @@ let { gameStart, handleInput } = (function () {
     }
 
     if (DEFAULT_RANDOM_PIPES) {
-      if (this.interval == 0) {
+      if (this.timeElapsed == 0) {
         this.spawnPipe(null);
       }
 
-      this.interval++;
-      if (this.interval == this.spawnInterval) {
-        this.interval = 0;
+      this.timeElapsed++;
+      if (this.timeElapsed == this.spawnInterval) {
+        this.timeElapsed = 0;
       }
     } else {
       // create pipes based on score
       // this.interval += this.divisions_per_frame;
-      this.interval += 1 / FPS;
+      this.timeElapsed += 1 / FPS;
       if (this.pipePositions.length === 0) {
         // we're done!
         // DEFAULT_RANDOM_PIPES = true;
-        // throw 'TODO end the game';
-      } else if (this.interval > this.pipePositions[0].start) {
+        this.gameEnded -= SPF;
+      } else if (this.timeElapsed > this.pipePositions[0].start) {
         var pipe = this.pipePositions.shift();
         this.spawnPipe(pipe);
-        console.log('pipe spawned', pipe.note);
+        // console.log('pipe spawned', pipe.note);
       }
     }
 
-    // TODO holes
-
     // this.score++;
     // this.maxScore = (this.score > this.maxScore) ? this.score : this.maxScore;
-    var self = this;
+
+    if (this.gameEnded < 0) {
+      this.stop();
+      return;
+    }
 
     if (FPS == 0) {
-      setZeroTimeout(function () {
-        self.update();
-      });
+      setZeroTimeout(() => this.update());
     } else {
-      // TODO set animation frame?
-      setTimeout(function () {
-        self.update();
-      }, MSPF);
+      // TODO request animation frame?
+      setTimeout(() => this.update(), MSPF);
     }
+  };
+
+  Game.prototype.stop = function () {
+    ON_END();
   };
 
   Game.prototype.isItEnd = function () {
@@ -516,8 +497,10 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  function gameStart({ randomPipes, part }) {
+  function gameStart({ randomPipes, part, onEnd, onStart }) {
     DEFAULT_RANDOM_PIPES = randomPipes;
+    ON_END = onEnd;
+    ON_START = onStart;
     PART = part;
     game = new Game();
     game.start();
