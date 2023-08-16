@@ -94,7 +94,7 @@ async function startGame(btn) {
   // await PitchDetection.start();
 
   gameStart({ randomPipes: false, part });
-  Play.part(score, 'Soprano');
+  Play.part(score, btn.dataset.part);
 }
 //       PitchDetection.stop();
 

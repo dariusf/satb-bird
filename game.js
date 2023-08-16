@@ -158,10 +158,13 @@ let { gameStart, handleInput } = (function () {
     this.birds = [];
     this.score = 0;
     this.canvas = document.querySelector('#flappy');
+    // this shows scroll bars
+    // this.canvas.width = Math.min(2048, window.innerWidth);
+    this.canvas.width = Math.min(2048, document.body.clientWidth);
     this.ctx = this.canvas.getContext('2d');
     this.width = this.canvas.width;
     this.height = this.canvas.height;
-    this.pipe_vert_padding = 20;
+    // this.pipe_vert_padding = 20;
 
     this.spawnInterval = NO_PIPES ? Number.MAX_VALUE : 90;
     this.interval = 0;
