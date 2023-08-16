@@ -59,9 +59,11 @@ MusicXML.init((score) => {
     let template = document.querySelector('#part-player');
     let elt = template.content.cloneNode(true);
     elt.querySelector('.name').textContent = p;
-    elt.querySelector('.info').textContent = `tempo: ${score.parts[p].tempo}, range: ${1}`;
+    elt.querySelector(
+      '.info'
+    ).textContent = `♩=${score.parts[p].tempo}, ${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`;
     elt.querySelector('button').dataset.part = p;
-    legend.after(elt);
+    legend.parentNode.appendChild(elt);
   }
   document.querySelector('#part-loaded').replaceChildren(container);
 

@@ -1,6 +1,21 @@
 let MusicXML = (function () {
   let onScoreLoaded;
 
+  let down_one = {
+    C: 'B',
+    'C#': 'C',
+    D: 'C#',
+    'D#': 'D',
+    E: 'D#',
+    F: 'E',
+    'F#': 'F',
+    G: 'F#',
+    'G#': 'G',
+    A: 'G#',
+    'A#': 'A',
+    B: 'A#',
+  };
+
   async function loadScoreURL(url) {
     // url can be relative to load from the repo
     const response = await fetch(url);
@@ -87,19 +102,51 @@ let MusicXML = (function () {
               res.rest = rest;
             } else {
               var p = nav(n, 'pitch')[0];
-              var note = p.children[0].textContent;
-              var octave = Number.parseInt(p.children[1].textContent);
+              var note = p.querySelector('step').textContent;
+              var alter = p.querySelector('alter');
+              if (alter) {
+                if (alter.textContent == '1') {
+                  note += '#';
+                } else if (alter.textContent == '-1') {
+                  note = down_one[note];
+                } else {
+                  console.assert(false, 'invalid alter ' + alter);
+                }
+              }
+              var octave = Number.parseInt(p.querySelector('octave').textContent);
               res.pitch = { note, octave };
             }
             return res;
           })
       );
 
+      let ordered = notes
+        .flat()
+        .filter((n) => n.pitch)
+        .map((n) => n.pitch.note + n.pitch.octave)
+        .map((n) => [n, freqTable[440].findIndex((m) => m.note == n)]);
+
+      ordered.sort(([_, a], [_n, b]) => a - b);
+
+      let [topNote, topi] = ordered[ordered.length - 1];
+      let [bottomNote, boti] = ordered[0];
+
+      function onedp(num) {
+        return Math.round(num * 10) / 10;
+      }
+
+      let numOctaves = onedp((topi - boti) / 12);
+
       window.score.parts[p.name] = {
         tempo: tempo,
         time: [beats, beatType],
         divisions: divisions,
         notes: notes,
+        range: {
+          top: topNote,
+          bottom: bottomNote,
+          octaves: numOctaves,
+        },
       };
     });
 
