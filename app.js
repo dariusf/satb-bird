@@ -59,6 +59,26 @@ MusicXML.init((score) => {
   console.log('musicxml loaded', score);
   lastScore = score;
 
+  shaped(score, {
+    name: String,
+    composer: String,
+    parts: objMap({
+      divisions: Number,
+      tempo: Number,
+      time: [Number],
+      notes: [
+        [oneOf({ duration: Number, rest: Boolean }, { duration: Number, pitch: { note: String, octave: Number } })],
+      ],
+      range: {
+        top: String,
+        bottom: String,
+        octaves: Number,
+        semitones: Number,
+        notes: [String],
+      },
+    }),
+  });
+
   let template = document.querySelector('#part-container');
   let container = template.content.cloneNode(true);
   let legend = container.querySelector('legend');
