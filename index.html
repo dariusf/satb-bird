@@ -7,37 +7,64 @@
 
   <body>
     <canvas id="flappy" width="500" height="512"></canvas>
-    <div id="app"></div>
-    <br /><br />
+    <div id="app">
+      <fieldset style="display: inline">
+        <legend>Game</legend>
+        <input accept=".musicxml,.xml,.mid,.midi" onChange="loadScore(this)" type="file" />
+        <br />
+        <div id="part-loaded"></div>
+        <template id="part-container">
+          <fieldset>
+            <legend></legend>
+          </fieldset>
+        </template>
+        <template id="part-player">
+          <div>
+            <div style="display: inline-block">
+              <div class="name"></div>
+              <div class="info"></div>
+            </div>
+            <button style="margin-left: 50px; vertical-align: top" data-part="" onclick="startGame(this)">play</button>
+          </div>
+        </template>
+      </fieldset>
+    </div>
 
-    <script src="https://unpkg.com/ml5@0.3.1/dist/ml5.min.js"></script>
-
-    <script type="text/javascript" src="https://unpkg.com/tone@13.8.25/build/Tone.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/@tonejs/midi"></script>
+    <!-- <script type="text/javascript" src="https://unpkg.com/tone@13.8.25/build/Tone.js"></script> -->
+    <!-- <script type="text/javascript" src="https://unpkg.com/@tonejs/midi"></script> -->
 
     <!-- production.min.js -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <!-- <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script> -->
+    <!-- <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script> -->
 
-    <script src="https://unpkg.com/@material-ui/core@4.5.1/umd/material-ui.development.js" crossorigin></script>
+    <!-- <script src="https://unpkg.com/@material-ui/core@4.5.1/umd/material-ui.development.js" crossorigin></script> -->
     <!-- material-ui.production.js" -->
 
+    <!-- <script src="https://unpkg.com/ml5@0.3.1/dist/ml5.min.js"></script> -->
+
     <script src="util.js"></script>
-    <script type="module" src="shaped.js"></script>
-    <script type="module" src="app.js"></script>
 
-    <script type="module" src="oscillator.js"></script>
-    <script type="module" src="autocorrelation.js"></script>
-    <script type="module" src="midi.js"></script>
+    <!-- pitch detection -->
+    <script src="notes.js"></script>
+    <script src="autocorrelation.js"></script>
 
-    <script type="module" src="score.js"></script>
+    <!-- other libs -->
+    <script src="game.js"></script>
+    <script src="musicxml.js"></script>
+
+    <!-- entry -->
+    <script src="app.js"></script>
+
+    <!-- <script type="module" src="app.js"></script> -->
+
+    <!-- <script type="module" src="oscillator.js"></script> -->
+    <!-- <script type="module" src="midi.js"></script> -->
 
     <!-- <script src = "https://bernii.github.io/gauge.js/dist/gauge.min.js"></script> -->
-    <script type="module" src="game.js"></script>
 
-    <script type="module">
+    <!-- <script type="module">
       import Game from './game.js';
       import Score from './score.js';
-    </script>
+    </script> -->
   </body>
 </html>
