@@ -9,7 +9,9 @@ let Play = (function () {
     oscillator = audioCtx.createOscillator();
     gain = audioCtx.createGain();
     // oscillator.type = 'sine';
-    oscillator.type = 'saw';
+    // oscillator.type = 'sawtooth';
+    // oscillator.type = 'square';
+    oscillator.type = 'triangle';
     oscillator.connect(gain);
     oscillator.frequency.value = freq;
     gain.connect(audioCtx.destination);
@@ -20,6 +22,8 @@ let Play = (function () {
 
     oscillator.start(audioCtx.currentTime + time);
     oscillator.stop(audioCtx.currentTime + time + dur);
+
+    return oscillator;
   }
 
   // nd is an array of [note, duration] arrays.
@@ -27,22 +31,24 @@ let Play = (function () {
   function notes(nd, tempo, bird_delay) {
     let audioCtx = new AudioContext();
     let currentTime = 0;
+    let sources = [];
     for (const [n, d] of nd) {
       let tpb = 1 / (tempo / 60) / 4; // quar/min -> quar/sec -> sec/quar -> sec/16th
       let dur = tpb * d;
       if (n) {
         let f = freqTable[440].filter((m) => m.note === n)[0].frequency;
-        playNote(audioCtx, f, currentTime + bird_delay, dur);
+        sources.push(playNote(audioCtx, f, currentTime + bird_delay, dur));
       }
       currentTime += dur;
     }
+    return () => sources.forEach((s) => s.stop(0));
   }
 
   function part(s, name, bird_delay) {
     function conv(n) {
       return [n.pitch ? n.pitch.note + n.pitch.octave : false, n.duration];
     }
-    notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo, bird_delay);
+    return notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo, bird_delay);
   }
   return { notes, part };
 })();
@@ -65,16 +71,15 @@ MusicXML.init((score) => {
     elt.querySelector(
       '.info'
     ).textContent = `♩=${score.parts[p].tempo}, ${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`;
-    elt.querySelector('button').dataset.part = p;
+    elt.querySelectorAll('button').forEach((b) => (b.dataset.part = p));
     legend.parentNode.appendChild(elt);
   }
   document.querySelector('#part-loaded').replaceChildren(container);
 
-  // temp
-  // Play.part(score, 'Soprano');
-  // Play.part(score, 'Alto');
-  // Play.part(score, 'Tenor');
-  // Play.part(score, 'Bass');
+  // preview level, rhythm-game style
+  for (const p in score.parts) {
+    previewPart(p);
+  }
 });
 
 function loadScore(e) {
@@ -82,6 +87,8 @@ function loadScore(e) {
 }
 
 async function startGame(btn) {
+  stopPreviewingParts();
+
   let part = lastScore.parts[btn.dataset.part];
   console.log('generating level using', part);
 
@@ -97,7 +104,6 @@ async function startGame(btn) {
   let app = document.querySelector('#app');
   let canvas = document.querySelector('#flappy');
   let title = document.querySelector('#title-text').parentNode;
-  // console.log(app, canvas);
 
   let bird_delay = gameStart({
     randomPipes: false,
@@ -109,15 +115,31 @@ async function startGame(btn) {
       canvas.style.display = 'block';
     },
     onEnd() {
-      // app.style.display = 'block';
       app.style.removeProperty('display');
       title.style.removeProperty('display');
-      // title.style.display = 'block';
       canvas.style.display = 'none';
     },
   });
   Play.part(score, btn.dataset.part, bird_delay);
 }
+
+let previewsPlaying = [];
+function previewPart(p) {
+  previewsPlaying.push(Play.part(score, p, 0));
+}
+
+function previewOnePart(btn) {
+  stopPreviewingParts();
+  previewPart(btn.dataset.part);
+}
+
+function stopPreviewingParts() {
+  for (const stop of previewsPlaying) {
+    stop();
+  }
+  previewsPlaying = [];
+}
+
 //       PitchDetection.stop();
 
 // window.startGame = startGame;

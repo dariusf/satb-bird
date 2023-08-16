@@ -5,11 +5,14 @@
     <meta charset="utf-8" />
 
     <style>
-      /* https://github.com/system-fonts/modern-font-stacks */
       #title-text {
+        font-size: 35px;
+      }
+
+      * {
+        /* https://github.com/system-fonts/modern-font-stacks */
         font-family: ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT',
           'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif;
-        font-size: 35px;
       }
 
       #title-text path {
@@ -46,14 +49,16 @@
             </fieldset>
           </template>
           <template id="part-player">
-            <div>
+            <div style="display: grid; grid-template-columns: 3fr 2fr">
               <div style="display: inline-block">
                 <div class="name"></div>
                 <div class="info"></div>
               </div>
-              <button style="margin-left: 50px; vertical-align: top" data-part="" onclick="startGame(this)">
-                play
-              </button>
+              <div style="vertical-align: top; display: flex; align-items: flex-start; justify-content: flex-end">
+                <button data-part="" onclick="previewOnePart(this)">⏵</button>
+                <button data-part="" onclick="stopPreviewingParts()">⏹</button>
+                <button data-part="" onclick="startGame(this)">play</button>
+              </div>
             </div>
           </template>
         </fieldset>
