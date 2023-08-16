@@ -4,6 +4,8 @@ let { gameStart, handleInput } = (function () {
   var DEFAULT_RANDOM_PIPES = false;
 
   let PART;
+  const PIPE_SPEED = 5;
+  const BIRD_X = 80;
 
   // TODO
   let flappyNote = 6;
@@ -68,7 +70,7 @@ let { gameStart, handleInput } = (function () {
   };
 
   var Bird = function (json) {
-    this.x = 80;
+    this.x = BIRD_X;
     this.y = 250;
     this.width = 40;
     this.height = 30;
@@ -132,7 +134,7 @@ let { gameStart, handleInput } = (function () {
     this.y = 0;
     this.width = 50;
     this.height = 40;
-    this.speed = 5;
+    this.speed = PIPE_SPEED;
 
     this.init(json);
   };
@@ -165,6 +167,9 @@ let { gameStart, handleInput } = (function () {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     // this.pipe_vert_padding = 20;
+
+    // the amount by which to delay the music
+    this.bird_to_right_edge_time = (this.width - BIRD_X) / (PIPE_SPEED * FPS);
 
     this.spawnInterval = NO_PIPES ? Number.MAX_VALUE : 90;
     this.interval = 0;
@@ -221,6 +226,7 @@ let { gameStart, handleInput } = (function () {
     let time = 0;
     for (const n of part.notes.flat()) {
       let tpb = 1 / (part.tempo / 60) / 4; // quar/min -> quar/sec -> sec/quar -> sec/16th
+
       let start = time;
       time += tpb * n.duration;
       let end = time;
@@ -510,13 +516,14 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  function start({ randomPipes, part }) {
+  function gameStart({ randomPipes, part }) {
     DEFAULT_RANDOM_PIPES = randomPipes;
     PART = part;
     game = new Game();
     game.start();
     game.update();
     game.display();
+    return game.bird_to_right_edge_time;
   }
 
   function handleInput(note) {
@@ -526,5 +533,5 @@ let { gameStart, handleInput } = (function () {
     // flappyNote = notePositions[note];
   }
 
-  return { gameStart: start, handleInput };
+  return { gameStart, handleInput };
 })();

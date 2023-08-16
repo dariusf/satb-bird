@@ -23,7 +23,7 @@ let Play = (function () {
 
   // nd is an array of [note, duration] arrays.
   // tempo is bpm, where each beat is a quarter note
-  function notes(nd, tempo) {
+  function notes(nd, tempo, bird_delay) {
     let audioCtx = new AudioContext();
     let currentTime = 0;
     for (const [n, d] of nd) {
@@ -31,17 +31,17 @@ let Play = (function () {
       let dur = tpb * d;
       if (n) {
         let f = freqTable[440].filter((m) => m.note === n)[0].frequency;
-        playNote(audioCtx, f, currentTime, dur);
+        playNote(audioCtx, f, currentTime + bird_delay, dur);
       }
       currentTime += dur;
     }
   }
 
-  function part(s, name) {
+  function part(s, name, bird_delay) {
     function conv(n) {
       return [n.pitch ? n.pitch.note + n.pitch.octave : false, n.duration];
     }
-    notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo);
+    notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo, bird_delay);
   }
   return { notes, part };
 })();
@@ -93,8 +93,8 @@ async function startGame(btn) {
 
   // await PitchDetection.start();
 
-  gameStart({ randomPipes: false, part });
-  Play.part(score, btn.dataset.part);
+  let bird_delay = gameStart({ randomPipes: false, part });
+  Play.part(score, btn.dataset.part, bird_delay);
 }
 //       PitchDetection.stop();
 
