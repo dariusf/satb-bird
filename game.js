@@ -3,7 +3,9 @@ let { gameStart, handleInput } = (function () {
   var INVULNERABLE = true;
   var DEFAULT_RANDOM_PIPES = false;
 
-  // TODO good default from calibration
+  let PART;
+
+  // TODO
   let flappyNote = 6;
   let lastNote;
 
@@ -36,7 +38,9 @@ let { gameStart, handleInput } = (function () {
 
   var game;
   var FPS = 60;
-  var maxScore = 0;
+  var SPF = 1 / FPS;
+  let MSPF = 1000 * SPF;
+  // var maxScore = 0;
 
   var images = {};
 
@@ -157,6 +161,7 @@ let { gameStart, handleInput } = (function () {
     this.ctx = this.canvas.getContext('2d');
     this.width = this.canvas.width;
     this.height = this.canvas.height;
+    this.pipe_vert_padding = 20;
 
     this.spawnInterval = NO_PIPES ? Number.MAX_VALUE : 90;
     this.interval = 0;
@@ -192,56 +197,153 @@ let { gameStart, handleInput } = (function () {
       return;
     }
 
-    var part = score.parts.Bass || score.parts[Object.keys(score.parts)[Object.keys(score.parts).length - 1]];
-    var bps = (part.tempo / 60) * (part.time[1] / 4);
-    var frames_per_beat = FPS / bps;
-    console.log('frames_per_beat', frames_per_beat);
-    // TODO instead of doing this, offset the pipe backwards by the difference
-    frames_per_beat = Math.floor(frames_per_beat);
+    // var part = score.parts.Bass || score.parts[Object.keys(score.parts)[Object.keys(score.parts).length - 1]];
+    let part = PART;
 
-    var divs_per_bar = part.divisions * (4 / part.time[1]) * part.time[0];
-    this.divisions_per_frame = divs_per_bar / part.time[0] / frames_per_beat;
+    // var bps = (part.tempo / 60) * (part.time[1] / 4);
+    // var frames_per_beat = FPS / bps;
+    // console.log('frames_per_beat', frames_per_beat);
+    // // TODO instead of doing this, offset the pipe backwards by the difference
+    // frames_per_beat = Math.floor(frames_per_beat);
+    // var divs_per_bar = part.divisions * (4 / part.time[1]) * part.time[0];
+    // this.divisions_per_frame = divs_per_bar / part.time[0] / frames_per_beat;
+
     // this.divisions_per_frame = 1 / this.divisions_per_frame;
 
     // TODO determine range from score
     // new Set(score.parts.Tenor.notes.flatMap(n => n).filter(n => !n.rest).map(n => n.pitch.note + n.pitch.octave))
 
-    // process all notes
-    var soFar = 0;
-    var intervals = [];
-    part.notes.forEach((m) => {
-      m.forEach((n) => {
-        if (!n.rest) {
-          intervals.push({
-            time: soFar,
-            pos: (this.height / 12) * notePositions[n.pitch.note],
-          });
-        }
-        soFar += n.duration;
-      });
-    });
+    // compute time offsets for where the pipes should be
+    let pipePositions = [];
+    let time = 0;
+    for (const n of part.notes.flat()) {
+      let tpb = 1 / (part.tempo / 60) / 4; // quar/min -> quar/sec -> sec/quar -> sec/16th
+      let start = time;
+      time += tpb * n.duration;
+      let end = time;
 
-    this.intervals = intervals;
+      // TODO what to do about long notes? multiple pipes? one giant pipe? start and end?
+
+      // ----^-----------
+      //     | padding
+      //     |
+      // ----v      ^
+      //            | hole 2
+      // ----   ^   v
+      //        | hole 1
+      // ----^  v
+      //     |
+      //     | padding (currently absent)
+      // ----v-----------
+
+      if (!n.rest) {
+        let name = n.pitch.note + n.pitch.octave;
+        // TODO padding? maybe unnecessary but ensures that two pipes are always visible per note
+        let idx = part.range.notes.indexOf(name);
+        let y1 = (this.height / part.range.semitones) * idx;
+        let y = this.height - y1;
+        console.log(part.range.semitones, part.range.notes, idx);
+        pipePositions.push({ start, end, y, note: n });
+      }
+      // time += n.duration;
+    }
+    console.log('pipes', pipePositions);
+
+    this.pipePositions = pipePositions;
     // TODO time signature may change halfway
 
-    console.log(this.divisions_per_frame, this.intervals);
+    // console.log(this.divisions_per_frame, this.intervals);
+  };
+
+  Game.prototype.debugPoint = function (x, y) {
+    this.ctx.save();
+    this.ctx.rect(x - 5, y - 5, 10, 10);
+    this.ctx.stroke();
+    this.ctx.restore();
+  };
+
+  // this spawns new pipes on the right side
+  Game.prototype.spawnPipe = function (pipe) {
+    // holes will spawn within 50 units of the top and bottom
+    var deltaBord = 50;
+
+    //                                      +------+       ^
+    //                                      |      |       |
+    //                                      |      |       |
+    //                                      |      |       |
+    //             ^    +--------------^-----------------+ |
+    //             |    |              |  y |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | | image
+    //             |    |              |    |      |     | | height
+    //             |    |       pipe   |    |      |     | |
+    //             |    |       height |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |          ^   v    +------+     | v
+    // this.height |    |   hole   |                     |
+    //             |    |   height |                     |
+    //             |    |          |                     |
+    //             |    |          v   ^  y +------+     | ^
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |       pipe   |    |      |     | |
+    //             |    |       height |    |      |     | | image
+    //             |    |              |    |      |     | | height
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             |    |              |    |      |     | |
+    //             v    +--------------v-----------------+ |
+    //                                      |      |       |
+    //                                      |      |       |
+    //                                      +------+       v
+
+    // the height of the hole
+    var holeHeight = 120;
+
+    // the y coord of the top left of the hole
+    if (pipe) {
+      var holeTLY = pipe.y - holeHeight / 2;
+    } else {
+      var holeTLY = Math.round(Math.random() * (this.height - deltaBord * 2 - holeHeight)) + deltaBord;
+    }
+
+    // debugPoint(this.width, 0);
+    this.debugPoint(this.width, holeTLY);
+    this.debugPoint(this.width, holeTLY + holeHeight);
+
+    // odd elements are top pipes and their x y is at the bottom left,
+    // whereas even elements have their x y at the top left
+    this.pipes.push(new Pipe({ x: this.width, y: 0, height: holeTLY }));
+    this.pipes.push(
+      new Pipe({
+        x: this.width,
+        y: holeTLY + holeHeight,
+        height: this.height,
+      })
+    );
   };
 
   Game.prototype.update = function () {
     this.backgroundx += this.backgroundSpeed;
-    var nextHoll = 0; // hole?
-    if (this.birds.length > 0) {
-      for (var i = 0; i < this.pipes.length; i += 2) {
-        // once the bird clears the pipe completely
-        if (this.pipes[i].x + this.pipes[i].width > this.birds[0].x) {
-          nextHoll = this.pipes[i].height / this.height;
-          break;
-        }
-      }
-    }
 
-    for (var i in this.birds) {
-      if (this.birds[i].alive) {
+    // var nextHoll = 0; // fraction of the screen up the next hole will be at
+    // if (this.birds.length > 0) {
+    //   for (var i = 0; i < this.pipes.length; i += 2) {
+    //     // TODO bug here. will miss pipes. also with score, is finite
+    //     // once the bird is completely to the right of a pipe
+    //     if (this.pipes[i].x + this.pipes[i].width > this.birds[0].x) {
+    //       nextHoll = this.pipes[i].height / this.height;
+    //       break;
+    //     }
+    //   }
+    // }
+
+    // flap or sing
+    for (var pipe in this.birds) {
+      if (this.birds[pipe].alive) {
         // var inputs = [
         // this.birds[i].y / this.height,
         // nextHoll
@@ -254,12 +356,12 @@ let { gameStart, handleInput } = (function () {
         // this.target = this.target || 0;
         // this.target ++;
 
-        this.birds[i].sing(this.height);
+        this.birds[pipe].sing(this.height);
         // }
 
-        this.birds[i].update();
-        if (this.birds[i].isDead(this.height, this.pipes)) {
-          this.birds[i].alive = false;
+        this.birds[pipe].update();
+        if (this.birds[pipe].isDead(this.height, this.pipes)) {
+          this.birds[pipe].alive = false;
           this.alives--;
           //console.log(this.alives);
           // Neuvol.networkScore(this.gen[i], this.score);
@@ -270,91 +372,18 @@ let { gameStart, handleInput } = (function () {
       }
     }
 
-    for (var i = 0; i < this.pipes.length; i++) {
-      this.pipes[i].update();
-      if (this.pipes[i].isOut()) {
-        this.pipes.splice(i, 1);
-        i--;
+    // move and remove pipes
+    for (var pipe = 0; pipe < this.pipes.length; pipe++) {
+      this.pipes[pipe].update();
+      if (this.pipes[pipe].isOut()) {
+        this.pipes.splice(pipe, 1);
+        pipe--;
       }
     }
-
-    var that = this;
-    function debugPoint(x, y) {
-      that.ctx.save();
-      that.ctx.rect(x - 5, y - 5, 10, 10);
-      that.ctx.stroke();
-      that.ctx.restore();
-    }
-
-    // this spawns new pipes on the right side
-    // TODO need to be tweaked a lot to correspond to notes
-    var spawnPipe = (pos) => {
-      // holes will spawn within 50 units of the top and bottom
-      var deltaBord = 50;
-
-      //                                      +------+       ^
-      //                                      |      |       |
-      //                                      |      |       |
-      //                                      |      |       |
-      //             ^    +--------------^-----------------+ |
-      //             |    |              |  y |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | | image
-      //             |    |              |    |      |     | | height
-      //             |    |       pipe   |    |      |     | |
-      //             |    |       height |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |          ^   v    +------+     | v
-      // this.height |    |   hole   |                     |
-      //             |    |   height |                     |
-      //             |    |          |                     |
-      //             |    |          v   ^  y +------+     | ^
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |       pipe   |    |      |     | |
-      //             |    |       height |    |      |     | | image
-      //             |    |              |    |      |     | | height
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             |    |              |    |      |     | |
-      //             v    +--------------v-----------------+ |
-      //                                      |      |       |
-      //                                      |      |       |
-      //                                      +------+       v
-
-      // the height of the hole
-      var pipeHoll = 120;
-
-      // the y coord of the top left of the hole
-      if (pos) {
-        var hollPosition = pos - pipeHoll / 2;
-      } else {
-        var hollPosition = Math.round(Math.random() * (this.height - deltaBord * 2 - pipeHoll)) + deltaBord;
-      }
-
-      // debugPoint(this.width, 0);
-      debugPoint(this.width, hollPosition);
-      debugPoint(this.width, hollPosition + pipeHoll);
-
-      // the coords are different for each pipe:
-      // the odd elements are top pipes and their x y is at the bottom left,
-      // whereas even elements have their x y at the top left
-      this.pipes.push(new Pipe({ x: this.width, y: 0, height: hollPosition }));
-      this.pipes.push(
-        new Pipe({
-          x: this.width,
-          y: hollPosition + pipeHoll,
-          height: this.height,
-        })
-      );
-    };
 
     if (DEFAULT_RANDOM_PIPES) {
       if (this.interval == 0) {
-        spawnPipe();
+        this.spawnPipe(null);
       }
 
       this.interval++;
@@ -363,13 +392,16 @@ let { gameStart, handleInput } = (function () {
       }
     } else {
       // create pipes based on score
-      this.interval += this.divisions_per_frame;
-      if (this.intervals.length === 0) {
+      // this.interval += this.divisions_per_frame;
+      this.interval += 1 / FPS;
+      if (this.pipePositions.length === 0) {
         // we're done!
-        DEFAULT_RANDOM_PIPES = true;
-      } else if (this.interval > this.intervals[0].time) {
-        var i = this.intervals.shift();
-        spawnPipe(i.pos);
+        // DEFAULT_RANDOM_PIPES = true;
+        // throw 'TODO end the game';
+      } else if (this.interval > this.pipePositions[0].start) {
+        var pipe = this.pipePositions.shift();
+        this.spawnPipe(pipe);
+        console.log('pipe spawned', pipe.note);
       }
     }
 
@@ -387,7 +419,7 @@ let { gameStart, handleInput } = (function () {
       // TODO set animation frame?
       setTimeout(function () {
         self.update();
-      }, 1000 / FPS);
+      }, MSPF);
     }
   };
 
@@ -410,7 +442,7 @@ let { gameStart, handleInput } = (function () {
       );
     }
 
-    for (var i in this.pipes) {
+    for (let i in this.pipes) {
       if (i % 2 == 0) {
         // drawImage(img, x, y, width, height)
         this.ctx.drawImage(
@@ -475,8 +507,9 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  function start({ randomPipes }) {
+  function start({ randomPipes, part }) {
     DEFAULT_RANDOM_PIPES = randomPipes;
+    PART = part;
     game = new Game();
     game.start();
     game.update();
@@ -487,7 +520,7 @@ let { gameStart, handleInput } = (function () {
     // TODO temporarily
     note = note.replace(/\d+/, '');
 
-    flappyNote = notePositions[note];
+    // flappyNote = notePositions[note];
   }
 
   return { gameStart: start, handleInput };

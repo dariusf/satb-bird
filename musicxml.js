@@ -61,16 +61,17 @@ let MusicXML = (function () {
 
       // TODO assumes only one timing throughout
 
+      // each quarter note is 4 divisions, this changes per measure
       var divisions = Number.parseInt(
         toList(data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/divisions/text()', data))[0]
           .data
       );
 
+      // 2/2, 4/4, etc.
       var beats = Number.parseInt(
         toList(data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/time/beats/text()', data))[0]
           .data
       );
-
       var beatType = Number.parseInt(
         toList(
           data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/time/beat-type/text()', data)
@@ -86,7 +87,6 @@ let MusicXML = (function () {
       }
 
       // TODO tempo is absent from the data, so this needs to be specified somewhere. or read from graphical markings. which then require changes to be handled
-
       var tempo = 120; // quarter note = 120 bpm; musescore's default
 
       // get notes from measures
@@ -120,6 +120,10 @@ let MusicXML = (function () {
           })
       );
 
+      function uniq(xs, on) {
+        return xs.filter((item, pos, ary) => !pos || on(item) != on(ary[pos - 1]));
+      }
+
       let ordered = notes
         .flat()
         .filter((n) => n.pitch)
@@ -127,6 +131,7 @@ let MusicXML = (function () {
         .map((n) => [n, freqTable[440].findIndex((m) => m.note == n)]);
 
       ordered.sort(([_, a], [_n, b]) => a - b);
+      ordered = uniq(ordered, (x) => x[0]);
 
       let [topNote, topi] = ordered[ordered.length - 1];
       let [bottomNote, boti] = ordered[0];
@@ -135,9 +140,12 @@ let MusicXML = (function () {
         return Math.round(num * 10) / 10;
       }
 
-      let numOctaves = onedp((topi - boti) / 12);
+      let semitones = topi - boti;
+      let numOctaves = onedp(semitones / 12);
+      let allNotes = ordered.map((n) => n[0]); // bottom to top
 
-      window.score.parts[p.name] = {
+      // window
+      score.parts[p.name] = {
         tempo: tempo,
         time: [beats, beatType],
         divisions: divisions,
@@ -146,6 +154,8 @@ let MusicXML = (function () {
           top: topNote,
           bottom: bottomNote,
           octaves: numOctaves,
+          semitones,
+          notes: allNotes,
         },
       };
     });

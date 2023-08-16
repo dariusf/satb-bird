@@ -3,6 +3,8 @@
 let Play = (function () {
   const epsilon = 0.00001;
 
+  // time is an offset from now
+  // dur is an offset from time
   function playNote(audioCtx, freq, time, dur) {
     oscillator = audioCtx.createOscillator();
     gain = audioCtx.createGain();
@@ -25,7 +27,7 @@ let Play = (function () {
     let audioCtx = new AudioContext();
     let currentTime = 0;
     for (const [n, d] of nd) {
-      let tpb = 1 / (tempo / 60) / 4; // qpm -> qps -> spq -> sp16th
+      let tpb = 1 / (tempo / 60) / 4; // quar/min -> quar/sec -> sec/quar -> sec/16th
       let dur = tpb * d;
       if (n) {
         let f = freqTable[440].filter((m) => m.note === n)[0].frequency;
@@ -79,22 +81,23 @@ function loadScore(e) {
 }
 
 async function startGame(btn) {
-  console.log('generating level using', lastScore.parts[btn.dataset.part]);
+  let part = lastScore.parts[btn.dataset.part];
+  console.log('generating level using', part);
 
-  PitchDetection.init((nc) => {
-    if (nc.note) {
-      console.log(nc);
-      handleInput(nc.note);
-    }
-  });
+  // PitchDetection.init((nc) => {
+  //   if (nc.note) {
+  //     console.log('pitch', nc);
+  //     handleInput(nc.note);
+  //   }
+  // });
 
-  //     if (this.state.mic.enabled) {
-  //       PitchDetection.stop();
-  //     } else {
-  await PitchDetection.start();
-  //     }
-  gameStart({ randomPipes: true });
+  // await PitchDetection.start();
+
+  gameStart({ randomPipes: false, part });
+  Play.part(score, 'Soprano');
 }
+//       PitchDetection.stop();
+
 // window.startGame = startGame;
 
 // import Game from './game.js';
