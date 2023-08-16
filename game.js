@@ -132,7 +132,7 @@ let { gameStart, handleInput } = (function () {
     this.y = 0;
     this.width = 50;
     this.height = 40;
-    this.speed = 3;
+    this.speed = 5;
 
     this.init(json);
   };
