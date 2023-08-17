@@ -146,7 +146,24 @@ let MusicXML = (function () {
               }
               var octave = Number.parseInt(p.querySelector('octave').textContent);
               res.pitch = { note, octave };
-              res.lyrics = n.querySelector('lyric text')?.textContent;
+              let lyrics_text = n.querySelector('lyric text');
+              if (lyrics_text === null) {
+                res.lyrics = '';
+              } else {
+                res.lyrics = lyrics_text.textContent;
+                let syl = n.querySelector('lyric syllabic')?.textContent;
+                switch (syl) {
+                  case 'middle':
+                    res.lyrics = `-${res.lyrics}-`;
+                    break;
+                  case 'begin':
+                    res.lyrics = `${res.lyrics}-`;
+                    break;
+                  case 'end':
+                    res.lyrics = `-${res.lyrics}`;
+                    break;
+                }
+              }
             }
             return res;
           })

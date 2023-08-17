@@ -109,7 +109,7 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     } else if (pattern instanceof Pred && pattern.pred(obj)) {
       // good
       return obj;
-    } else if (pattern instanceof Function && pattern(obj)) {
+    } else if (pattern instanceof Function && pattern(obj) === true) {
       // good
       return obj;
     } else if (pattern instanceof Any) {
@@ -177,6 +177,7 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   }
 
   shouldFail(() => shaped([1, 2], [(x) => x == 2]));
+  shouldFail(() => shaped(null, String));
 
   // TODO this isn't implemented yet, just passes because it's a function
   // shouldFail(() =>
