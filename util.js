@@ -78,3 +78,5 @@ function rotate(n, a) {
 
 //   window.notePositions = notePositions;
 // })();
+
+const epsilon = 0.00001;

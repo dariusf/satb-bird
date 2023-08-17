@@ -1,8 +1,6 @@
 // import Game from './game.js';
 
 let Play = (function () {
-  const epsilon = 0.00001;
-
   // time is an offset from now
   // dur is an offset from time
   function playNote(audioCtx, freq, time, dur) {
@@ -125,26 +123,37 @@ function loadExample(s) {
   MusicXML.loadScoreURL(s.value);
 }
 
-function isNote(n) {
-  return !!freqTable[440].filter((m) => m.note === n);
-}
-
 async function startGame(btn) {
   stopPreviewingParts();
 
   let part = lastScore.parts[btn.dataset.part];
   console.log('generating level using', part);
 
-  Autocorrelation.init((nc) => {
+  function onNote(nc) {
     // this is expensive
     shaped(nc, { note: nullOr(isNote), cents: nullOr(Number) });
     if (nc.note) {
       console.log('pitch', nc);
       handleInput(nc.note);
     }
-  });
+  }
 
-  Autocorrelation.start(micStream);
+  let testSinging = false;
+  // let testSinging = true;
+
+  if (testSinging) {
+    setInterval(() => {
+      onNote({
+        note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
+        cents: 0,
+      });
+    }, 2000);
+  } else {
+    Autocorrelation.init(onNote);
+    // permission has been requested by this point,
+    // this just connects the micStream to the game
+    Autocorrelation.start(micStream);
+  }
 
   let app = document.querySelector('#app');
   let canvas = document.querySelector('#flappy');

@@ -159,6 +159,11 @@
     <script src="notes.js"></script>
     <script src="autocorrelation.js"></script>
 
+    <script>
+      function isNote(n) {
+        return !!freqTable[440].filter((m) => m.note === n);
+      }
+    </script>
     <!-- other libs -->
     <script src="game.js"></script>
     <script src="musicxml.js"></script>

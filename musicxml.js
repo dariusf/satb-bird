@@ -178,7 +178,7 @@ let MusicXML = (function () {
       // high to low, as higher notes are nearer the origin
       let botIdx = freqTable[440].findIndex((m) => m.note === bottomNote);
       let allNotes = freqTable[440]
-        .slice(botIdx, botIdx + semitones)
+        .slice(botIdx, botIdx + semitones + 1)
         .map((n) => n.note)
         .reverse();
       // ordered.map((n) => n[0]);

@@ -7,12 +7,10 @@ let { gameStart, handleInput } = (function () {
 
   let PART;
   const PIPE_SPEED = 5;
-  const BIRD_X = 80;
+  const BIRD_X = 140;
   const BREATHING_TIME = 5;
 
-  // TODO
-  let flappyNote = 6;
-  let lastNote;
+  let flappyNote;
 
   // why is this useful? see:
   // https://dbaron.org/log/20100309-faster-timeouts
@@ -95,18 +93,31 @@ let { gameStart, handleInput } = (function () {
     this.gravity = this.jump;
   };
 
-  Bird.prototype.sing = function (levelHeight) {
-    var increments = levelHeight / 12;
-    lastNote = lastNote || 6;
-    var dest = flappyNote || lastNote;
-    lastNote = dest;
-    var current = this.y / increments;
-    var speed = 5;
-    this.gravity = (dest - current) * speed;
+  Bird.prototype.sing = function () {
+    shaped(flappyNote, nullOr(isNote));
+    if (!flappyNote) {
+      this.gravity = 0;
+      return;
+    }
+    let dest = game.noteToPosition(flappyNote);
+    let speed = 12;
+    let dir;
+    if (Math.abs(dest - this.y) < speed) {
+      this.y = dest;
+      dir = 0;
+    } else if (dest < this.y) {
+      dir = -1;
+    } else {
+      dir = 1;
+    }
+    this.gravity = dir * speed;
   };
 
   Bird.prototype.update = function () {
-    this.gravity += this.velocity;
+    // gravity is really the downward velocity
+    // temporarily disabled as we're not using flapping controls
+    // this.gravity += this.velocity;
+
     this.y += this.gravity;
   };
 
@@ -191,6 +202,14 @@ let { gameStart, handleInput } = (function () {
     this.backgroundx = 0;
   };
 
+  Game.prototype.noteToPosition = function (noteName) {
+    let padding = 120;
+    let notes = PART.range.notes;
+    let idx = notes.indexOf(noteName);
+    let y = ((this.height - padding * 2) / notes.length) * idx + padding;
+    return y;
+  };
+
   Game.prototype.start = function () {
     this.timeElapsed = NO_PIPES ? 1 : 0;
     this.pipes = [];
@@ -208,7 +227,6 @@ let { gameStart, handleInput } = (function () {
 
     // var bps = (part.tempo / 60) * (part.time[1] / 4);
     // var frames_per_beat = FPS / bps;
-    // console.log('frames_per_beat', frames_per_beat);
     // // TODO instead of doing this, offset the pipe backwards by the difference
     // frames_per_beat = Math.floor(frames_per_beat);
     // var divs_per_bar = part.divisions * (4 / part.time[1]) * part.time[0];
@@ -244,11 +262,13 @@ let { gameStart, handleInput } = (function () {
       // ----v-----------
 
       if (!n.rest) {
-        let name = n.pitch.note + n.pitch.octave;
-        let padding = 120;
-        let idx = part.range.notes.indexOf(name);
+        let noteName = n.pitch.note + n.pitch.octave;
+
+        // let padding = 120;
+        // let idx = part.range.notes.indexOf(noteName);
         // part.range.notes.length -
-        let y = ((this.height - padding * 2) / part.range.notes.length) * idx + padding;
+        let y = this.noteToPosition(noteName);
+        // ((this.height - padding * 2) / part.range.notes.length) * idx + padding;
         // let y = this.height - y1;
         // console.log(part.range.semitones, part.range.notes, idx);
         pipePositions.push({ start, end, y, note: n });
@@ -342,7 +362,7 @@ let { gameStart, handleInput } = (function () {
     // flap (or sing)
     for (var pipe in this.birds) {
       if (this.birds[pipe].alive) {
-        this.birds[pipe].sing(this.height);
+        this.birds[pipe].sing();
         this.birds[pipe].update();
         if (this.birds[pipe].isDead(this.height, this.pipes)) {
           this.birds[pipe].alive = false;
@@ -519,10 +539,7 @@ let { gameStart, handleInput } = (function () {
   }
 
   function handleInput(note) {
-    // TODO temporarily
-    note = note.replace(/\d+/, '');
-
-    // flappyNote = notePositions[note];
+    flappyNote = note;
   }
 
   return { gameStart, handleInput };

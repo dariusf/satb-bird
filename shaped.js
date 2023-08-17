@@ -108,14 +108,17 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
       // good
     } else if (pattern instanceof Pred && pattern.pred(obj)) {
       // good
+      return obj;
     } else if (pattern instanceof Function && pattern(obj)) {
       // good
+      return obj;
     } else if (pattern instanceof Any) {
       // all good
     } else if (obj === null && pattern instanceof NullOr) {
       // all good
+      return null;
     } else if (obj !== null && pattern instanceof NullOr) {
-      checkShape(obj, pattern.pred, [...path, 'null or']);
+      return checkShape(obj, pattern.pred, [...path, 'null or']);
     } else if (typeof obj === 'object' && typeof pattern === 'object') {
       Object.keys(pattern).forEach((k) => {
         checkShape(obj[k], pattern[k], [...path, `[${k}]`]);
@@ -186,5 +189,19 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   );
   // );
 
-  return { shaped, oneOf, objMap, pred, any, func, nullOr };
+  // let prod = false;
+  let prod = true;
+
+  if (prod) {
+    return new Proxy(
+      {},
+      {
+        get: function (target, name) {
+          return (obj, _) => obj;
+        },
+      }
+    );
+  } else {
+    return { shaped, oneOf, objMap, pred, any, func, nullOr };
+  }
 })();
