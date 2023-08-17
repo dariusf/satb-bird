@@ -146,6 +146,7 @@ let MusicXML = (function () {
               }
               var octave = Number.parseInt(p.querySelector('octave').textContent);
               res.pitch = { note, octave };
+              res.lyrics = n.querySelector('lyric text')?.textContent;
             }
             return res;
           })
@@ -173,9 +174,12 @@ let MusicXML = (function () {
 
       let semitones = topi - boti;
       let numOctaves = onedp(semitones / 12);
-      let allNotes = ordered.map((n) => n[0]); // bottom to top
 
-      // window
+      // bottom to top
+      let allNotes = ordered.map((n) => n[0]);
+      // note that allNotes.length != semitones in general,
+      // as there may be notes in range which are never sung
+
       score.parts[p.name] = {
         tempo: tempo,
         time: [beats, beatType],

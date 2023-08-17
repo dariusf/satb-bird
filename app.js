@@ -67,7 +67,12 @@ MusicXML.init((score) => {
       tempo: Number,
       time: [Number],
       notes: [
-        [oneOf({ duration: Number, rest: Boolean }, { duration: Number, pitch: { note: String, octave: Number } })],
+        [
+          oneOf(
+            { duration: Number, rest: Boolean },
+            { duration: Number, pitch: { note: String, octave: Number }, lyrics: String }
+          ),
+        ],
       ],
       range: {
         top: String,
