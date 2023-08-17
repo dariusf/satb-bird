@@ -28,7 +28,10 @@
         border: 1px solid #ccc;
         /* width: 200px; */
       }
-      .tab-bar button,
+      .tab-bar button {
+        margin: 3px;
+      }
+
       button {
         background-color: inherit;
         /* float: left; */
@@ -127,9 +130,11 @@
             <div class="info"></div>
           </div>
           <div style="vertical-align: top; display: flex; align-items: flex-start; justify-content: flex-end">
-            <button data-part="" onclick="previewOnePart(this)">⏵</button>
-            <button data-part="" onclick="stopPreviewingParts()">⏹</button>
-            <button data-part="" onclick="startGame(this)">start game</button>
+            <!-- <button data-part="" onclick="previewOnePart(this)">⏵</button> -->
+            <!-- <button data-part="" onclick="stopPreviewingParts()">⏹</button> -->
+            <button data-part="" onclick="previewOnePart(this)">listen</button>
+            <button data-part="" onclick="stopPreviewingParts()">stop</button>
+            <button data-part="" onclick="startGame(this)">play</button>
           </div>
         </div>
       </template>
