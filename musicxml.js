@@ -108,8 +108,7 @@ let MusicXML = (function () {
       // https://stackoverflow.com/questions/62360949/get-the-tempos-of-a-parsed-musicxml-file
       // quarter notes/minute
       // musescore's default is 120 bpm
-      // var tempo = 120;
-      var tempo = 80;
+      var tempo = 120;
 
       try {
         tempo = +data.evaluate('/score-partwise/part/measure/direction/sound/@tempo', data).iterateNext().value;
@@ -123,62 +122,71 @@ let MusicXML = (function () {
         return list(elt.children).filter((c) => c.tagName === tag);
       }
 
-      // get notes from measures
-      var notes = list(measures).map((m) =>
-        list(m.children)
-          .filter((e) => e.tagName === 'note')
-          .map((n) => {
-            let duration = Number.parseInt(nav(n, 'duration')[0].textContent);
-            let res = {
-              duration,
-            };
-            var rest = nav(n, 'rest').length != 0;
-            if (rest) {
-              res.rest = rest;
-            } else {
-              var p = nav(n, 'pitch')[0];
-              var note = p.querySelector('step').textContent;
-              var alter = p.querySelector('alter');
-              if (alter) {
-                if (alter.textContent == '1') {
-                  note += '#';
-                } else if (alter.textContent == '-1') {
-                  note = down_one[note];
-                } else {
-                  console.assert(false, 'invalid alter ' + alter);
-                }
-              }
-              var octave = Number.parseInt(p.querySelector('octave').textContent);
-              res.pitch = { note, octave };
-              let lyrics_text = n.querySelector('lyric text');
-              if (lyrics_text === null) {
-                res.lyrics = '';
+      // convert measures into a flat list of notes,
+      // merging tied adjacent ones
+      let prenotes = list(measures)
+        .flatMap((m) => list(m.children))
+        .filter((e) => e.tagName === 'note');
+
+      let notes = [];
+      for (const n of prenotes) {
+        let duration = Number.parseInt(nav(n, 'duration')[0].textContent);
+        let tie = nav(n, 'tie');
+        let tied = tie.length && tie[0].getAttribute('type') === 'stop';
+        if (tied) {
+          let res = notes[notes.length - 1];
+          // assume the pitch is the same, according to spec
+          res.duration += duration;
+        } else {
+          let res = {
+            duration,
+          };
+          let rest = nav(n, 'rest').length != 0;
+          if (rest) {
+            res.rest = rest;
+          } else {
+            let p = nav(n, 'pitch')[0];
+            let note = p.querySelector('step').textContent;
+            let alter = p.querySelector('alter');
+            if (alter) {
+              if (alter.textContent == '1') {
+                note += '#';
+              } else if (alter.textContent == '-1') {
+                note = down_one[note];
               } else {
-                res.lyrics = lyrics_text.textContent;
-                let syl = n.querySelector('lyric syllabic')?.textContent;
-                switch (syl) {
-                  case 'middle':
-                    res.lyrics = `-${res.lyrics}-`;
-                    break;
-                  case 'begin':
-                    res.lyrics = `${res.lyrics}-`;
-                    break;
-                  case 'end':
-                    res.lyrics = `-${res.lyrics}`;
-                    break;
-                }
+                console.assert(false, 'invalid alter ' + alter);
               }
             }
-            return res;
-          })
-      );
+            let octave = Number.parseInt(p.querySelector('octave').textContent);
+            res.pitch = { note, octave };
+            let lyrics_text = n.querySelector('lyric text');
+            if (lyrics_text === null) {
+              res.lyrics = '';
+            } else {
+              res.lyrics = lyrics_text.textContent;
+              let syl = n.querySelector('lyric syllabic')?.textContent;
+              switch (syl) {
+                case 'middle':
+                  res.lyrics = `-${res.lyrics}-`;
+                  break;
+                case 'begin':
+                  res.lyrics = `${res.lyrics}-`;
+                  break;
+                case 'end':
+                  res.lyrics = `-${res.lyrics}`;
+                  break;
+              }
+            }
+          }
+          notes.push(res);
+        }
+      }
 
       function uniq(xs, on) {
         return xs.filter((item, pos, ary) => !pos || on(item) != on(ary[pos - 1]));
       }
 
       let ordered = notes
-        .flat()
         .filter((n) => n.pitch)
         .map((n) => n.pitch.note + n.pitch.octave)
         .map((n) => [n, freqTable[440].findIndex((m) => m.note == n)]);
@@ -202,12 +210,6 @@ let MusicXML = (function () {
         .slice(botIdx, botIdx + semitones + 1)
         .map((n) => n.note)
         .reverse();
-      // ordered.map((n) => n[0]);
-      // note that ordered isn't the same as allNotes
-      // as there may be notes in range which are never sung
-
-      // debugger;
-      // shaped(allNotes.length, (l) => l === semitones);
 
       score.parts[p.name] = {
         tempo: tempo,
@@ -218,7 +220,6 @@ let MusicXML = (function () {
           top: topNote,
           bottom: bottomNote,
           octaves: numOctaves,
-          // semitones,
           notes: allNotes,
         },
       };

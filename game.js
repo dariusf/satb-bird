@@ -227,7 +227,7 @@ let { gameStart, handleInput } = (function () {
     // compute time offsets for where the pipes should be
     let pipePositions = [];
     let time = 0;
-    for (const n of part.notes.flat()) {
+    for (const n of part.notes) {
       let dur = durationToTime(part.tempo, part.divisions, n.duration);
 
       let start = time;

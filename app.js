@@ -45,7 +45,7 @@ let Play = (function () {
     function conv(n) {
       return [n.pitch ? n.pitch.note + n.pitch.octave : false, n.duration];
     }
-    return notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo, s.parts[name].divisions, bird_delay);
+    return notes(s.parts[name].notes.map(conv), s.parts[name].tempo, s.parts[name].divisions, bird_delay);
   }
   return { notes, part };
 })();
