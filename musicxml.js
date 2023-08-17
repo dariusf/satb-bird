@@ -150,7 +150,14 @@ let MusicXML = (function () {
             let alter = p.querySelector('alter');
             if (alter) {
               if (alter.textContent == '1') {
-                note += '#';
+                // the same letter is never used twice in scores,
+                // so sometimes we need to transform things we find
+                // in the wild to our canonical representation
+                if (note == 'E') {
+                  note = 'F';
+                } else {
+                  note += '#';
+                }
               } else if (alter.textContent == '-1') {
                 note = down_one[note];
               } else {
