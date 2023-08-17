@@ -203,6 +203,18 @@ let { gameStart, handleInput } = (function () {
   };
 
   Game.prototype.noteToPosition = function (noteName) {
+    // ----^-----------
+    //     | padding
+    //     |
+    // ----v      ^
+    //            | hole 2
+    // ----   ^   v
+    //        | hole 1
+    // ----^  v
+    //     |
+    //     | padding (currently absent)
+    // ----v-----------
+
     let padding = 120;
     let notes = PART.range.notes;
     let idx = notes.indexOf(noteName);
@@ -224,7 +236,9 @@ let { gameStart, handleInput } = (function () {
 
     let part = PART;
 
-    // compute time offsets for where the pipes should be
+    // compute time offsets for where the pipes should be,
+    // and the positions of hole centres.
+    // (next: pipePositions)
     let pipePositions = [];
     let time = 0;
     for (const n of part.notes) {
@@ -234,40 +248,15 @@ let { gameStart, handleInput } = (function () {
       time += dur;
       let end = time;
 
-      // TODO what to do about long notes? multiple pipes? one giant pipe? start and end?
-
-      // ----^-----------
-      //     | padding
-      //     |
-      // ----v      ^
-      //            | hole 2
-      // ----   ^   v
-      //        | hole 1
-      // ----^  v
-      //     |
-      //     | padding (currently absent)
-      // ----v-----------
-
       if (!n.rest) {
         let noteName = n.pitch.note + n.pitch.octave;
-
-        // let padding = 120;
-        // let idx = part.range.notes.indexOf(noteName);
-        // part.range.notes.length -
         let y = this.noteToPosition(noteName);
-        // ((this.height - padding * 2) / part.range.notes.length) * idx + padding;
-        // let y = this.height - y1;
-        // console.log(part.range.semitones, part.range.notes, idx);
         pipePositions.push({ start, end, y, note: n });
       }
-      // time += n.duration;
     }
-    // console.log('pipes', pipePositions);
 
     this.pipePositions = pipePositions;
     // TODO time signature may change halfway
-
-    // console.log(this.divisions_per_frame, this.intervals);
   };
 
   Game.prototype.debugPoint = function (x, y) {
@@ -278,7 +267,9 @@ let { gameStart, handleInput } = (function () {
     this.ctx.restore();
   };
 
-  // this spawns new pipes on the right side
+  // this spawns new pipes on the right side when it's time.
+  // given the hole centres, compute where to place the graphics.
+  // next: pipetop
   Game.prototype.spawnPipe = function (pipe) {
     //                                      +------+       ^
     //                                      |      |       |
@@ -434,6 +425,8 @@ let { gameStart, handleInput } = (function () {
       );
     }
 
+    // given the positions of the graphics, compute where to draw them,
+    // and also where to render lyrics
     for (let i in this.pipes) {
       let { top, bot, hole, note } = this.pipes[i];
       // drawImage(img, x, y, width, height)
