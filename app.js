@@ -78,7 +78,7 @@ MusicXML.init((score) => {
         top: String,
         bottom: String,
         octaves: Number,
-        semitones: Number,
+        // semitones: Number,
         notes: [String],
       },
     }),
@@ -127,14 +127,14 @@ async function startGame(btn) {
   let part = lastScore.parts[btn.dataset.part];
   console.log('generating level using', part);
 
-  // PitchDetection.init((nc) => {
-  //   if (nc.note) {
-  //     console.log('pitch', nc);
-  //     handleInput(nc.note);
-  //   }
-  // });
+  PitchDetection.init((nc) => {
+    if (nc.note) {
+      console.log('pitch', nc);
+      handleInput(nc.note);
+    }
+  });
 
-  // await PitchDetection.start();
+  await PitchDetection.start();
 
   let app = document.querySelector('#app');
   let canvas = document.querySelector('#flappy');

@@ -175,10 +175,18 @@ let MusicXML = (function () {
       let semitones = topi - boti;
       let numOctaves = onedp(semitones / 12);
 
-      // bottom to top
-      let allNotes = ordered.map((n) => n[0]);
-      // note that allNotes.length != semitones in general,
+      // high to low, as higher notes are nearer the origin
+      let botIdx = freqTable[440].findIndex((m) => m.note === bottomNote);
+      let allNotes = freqTable[440]
+        .slice(botIdx, botIdx + semitones)
+        .map((n) => n.note)
+        .reverse();
+      // ordered.map((n) => n[0]);
+      // note that ordered isn't the same as allNotes
       // as there may be notes in range which are never sung
+
+      // debugger;
+      // shaped(allNotes.length, (l) => l === semitones);
 
       score.parts[p.name] = {
         tempo: tempo,
@@ -189,7 +197,7 @@ let MusicXML = (function () {
           top: topNote,
           bottom: bottomNote,
           octaves: numOctaves,
-          semitones,
+          // semitones,
           notes: allNotes,
         },
       };

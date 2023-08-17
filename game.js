@@ -245,10 +245,11 @@ let { gameStart, handleInput } = (function () {
 
       if (!n.rest) {
         let name = n.pitch.note + n.pitch.octave;
-        // TODO padding? maybe unnecessary but ensures that two pipes are always visible per note
+        let padding = 120;
         let idx = part.range.notes.indexOf(name);
-        let y1 = (this.height / part.range.semitones) * idx;
-        let y = this.height - y1;
+        // part.range.notes.length -
+        let y = ((this.height - padding * 2) / part.range.notes.length) * idx + padding;
+        // let y = this.height - y1;
         // console.log(part.range.semitones, part.range.notes, idx);
         pipePositions.push({ start, end, y, note: n });
       }
@@ -264,6 +265,7 @@ let { gameStart, handleInput } = (function () {
 
   Game.prototype.debugPoint = function (x, y) {
     this.ctx.save();
+    this.ctx.fillStyle = '#f00';
     this.ctx.rect(x - 5, y - 5, 10, 10);
     this.ctx.stroke();
     this.ctx.restore();
@@ -271,13 +273,10 @@ let { gameStart, handleInput } = (function () {
 
   // this spawns new pipes on the right side
   Game.prototype.spawnPipe = function (pipe) {
-    // holes will spawn within 50 units of the top and bottom
-    var deltaBord = 50;
-
     //                                      +------+       ^
     //                                      |      |       |
     //                                      |      |       |
-    //                                      |      |       |
+    //                 0,0                  |      |       |
     //             ^    +--------------^-----------------+ |
     //             |    |              |  y |      |     | |
     //             |    |              |    |      |     | |
@@ -314,12 +313,14 @@ let { gameStart, handleInput } = (function () {
     if (pipe) {
       var holeTLY = pipe.y - holeHeight / 2;
     } else {
-      var holeTLY = Math.round(Math.random() * (this.height - deltaBord * 2 - holeHeight)) + deltaBord;
+      // holes will spawn within 50 units of the top and bottom
+      var padding = 50;
+      var holeTLY = Math.round(Math.random() * (this.height - padding * 2 - holeHeight)) + padding;
     }
 
     // debugPoint(this.width, 0);
-    this.debugPoint(this.width, holeTLY);
-    this.debugPoint(this.width, holeTLY + holeHeight);
+    // this.debugPoint(this.width, holeTLY);
+    // this.debugPoint(this.width, holeTLY + holeHeight);
 
     // odd elements are top pipes and their x y is at the bottom left,
     // whereas even elements have their x y at the top left
@@ -445,21 +446,21 @@ let { gameStart, handleInput } = (function () {
       this.ctx.drawImage(images.pipebottom, bot.x, bot.y, bot.width, images.pipetop.height);
     }
 
-    let debug = false;
+    // let debug = false;
+    // let debug = true;
 
-    if (debug) {
-      this.ctx.save();
-      this.ctx.fillStyle = '#000';
-      for (let i = 0; i < PART.range.semitones; i++) {
-        // TODO need the note names in sequence to draw this
-        this.ctx.fillText(i, 100, i * (this.height / PART.range.semitones));
-      }
-      // this.ctx.beginPath();
-      // this.ctx.moveTo(10, 45);
-      // this.ctx.lineTo(180, 47);
-      // this.ctx.stroke();
-      this.ctx.restore();
-    }
+    // if (debug) {
+    //   this.ctx.save();
+    //   this.ctx.fillStyle = '#000';
+    //   for (let i = 0; i < PART.range.notes.length; i++) {
+    //     this.ctx.fillText(i, 200, this.height - i * (this.height / PART.range.notes.length));
+    //   }
+    //   // this.ctx.beginPath();
+    //   // this.ctx.moveTo(10, 45);
+    //   // this.ctx.lineTo(180, 47);
+    //   // this.ctx.stroke();
+    //   this.ctx.restore();
+    // }
 
     this.ctx.fillStyle = '#FFC600';
     this.ctx.strokeStyle = '#CE9E00';
