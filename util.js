@@ -1,11 +1,33 @@
-function isAudioContextSupported() {
-  window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  return !!window.AudioContext;
-}
+// function isAudioContextSupported() {
+//   window.AudioContext = window.AudioContext || window.webkitAudioContext;
+//   return !!window.AudioContext;
+// }
 
-function isGetUserMediaSupported() {
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  return (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || navigator.getUserMedia;
+// function isGetUserMediaSupported() {
+//   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+//   return (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || navigator.getUserMedia;
+// }
+
+async function requestMicPermission() {
+  // TODO required?
+
+  //   if (audioContext.state === "suspended") {
+  //     audioContext.resume();
+  //   }
+
+  // let getUserMedia =
+  //   navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+
+  //     ? navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
+  //     : function (constraints) {
+  //         return new Promise(function (resolve, reject) {
+  //           navigator.getUserMedia(constraints, resolve, reject);
+  //         });
+  //       };
+
+  return navigator.mediaDevices.getUserMedia({ audio: true });
+
+  // throttleOutput('C4', 0);
 }
 
 // for consuming XPathResults fully

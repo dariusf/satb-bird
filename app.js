@@ -54,8 +54,9 @@ let Play = (function () {
 })();
 
 let lastScore;
+let micStream;
 
-MusicXML.init((score) => {
+MusicXML.init(async (score) => {
   console.log('musicxml loaded', score);
   lastScore = score;
 
@@ -104,6 +105,9 @@ MusicXML.init((score) => {
   }
   document.querySelector('#part-loaded').replaceChildren(container);
 
+  // request permission at this point, right before we start playing audio
+  micStream = await requestMicPermission();
+
   // preview level, rhythm-game style
   for (const p in score.parts) {
     previewPart(p);
@@ -127,14 +131,14 @@ async function startGame(btn) {
   let part = lastScore.parts[btn.dataset.part];
   console.log('generating level using', part);
 
-  PitchDetection.init((nc) => {
+  Autocorrelation.init((nc) => {
     if (nc.note) {
       console.log('pitch', nc);
       handleInput(nc.note);
     }
   });
 
-  await PitchDetection.start();
+  Autocorrelation.start(micStream);
 
   let app = document.querySelector('#app');
   let canvas = document.querySelector('#flappy');

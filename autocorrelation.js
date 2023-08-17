@@ -1,6 +1,6 @@
 // import freqTable from './notes.js';
 
-let PitchDetection = (function () {
+let Autocorrelation = (function () {
   // https://developer.microsoft.com/en-us/microsoft-edge/testdrive/demos/webaudiotuner
 
   // TODO oscillator also specifies this
@@ -125,18 +125,6 @@ let PitchDetection = (function () {
     frameId = window.requestAnimationFrame(detectPitch);
   }
 
-  function streamReceived(stream) {
-    micStream = stream;
-
-    analyserAudioNode = audioContext.createAnalyser();
-    analyserAudioNode.fftSize = 2048;
-
-    sourceAudioNode = audioContext.createMediaStreamSource(micStream);
-    sourceAudioNode.connect(analyserAudioNode);
-
-    detectPitch();
-  }
-
   function stop() {
     if (sourceAudioNode && sourceAudioNode.mediaStream && sourceAudioNode.mediaStream.stop) {
       sourceAudioNode.mediaStream.stop();
@@ -149,49 +137,32 @@ let PitchDetection = (function () {
     window.cancelAnimationFrame(frameId);
   }
 
-  async function start() {
-    // TODO required?
+  // stream is the return value of getUserMedia
+  function start(stream) {
+    micStream = stream;
 
-    //   if (audioContext.state === "suspended") {
-    //     audioContext.resume();
-    //   }
+    analyserAudioNode = audioContext.createAnalyser();
+    analyserAudioNode.fftSize = 2048;
 
-    // let getUserMedia =
-    //   navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+    sourceAudioNode = audioContext.createMediaStreamSource(micStream);
+    sourceAudioNode.connect(analyserAudioNode);
 
-    //     ? navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
-    //     : function (constraints) {
-    //         return new Promise(function (resolve, reject) {
-    //           navigator.getUserMedia(constraints, resolve, reject);
-    //         });
-    //       };
-
-    return (
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        // getUserMedia({ audio: true })
-        .then(streamReceived)
-        .catch((e) => {
-          // TODO is this what we do?
-          throw e;
-        })
-    );
-    // throttleOutput('C4', 0);
+    detectPitch();
   }
 
-  function init(f) {
+  function init(onPitchDetected) {
     // if (!isGetUserMediaSupported()) {
     //   throw (
     //     'It looks like this browser does not support getUserMedia. ' +
     //     'Check <a href="http://caniuse.com/#feat=stream">http://caniuse.com/#feat=stream</a> for more info.'
     //   );
     // }
-    if (isAudioContextSupported()) {
-      audioContext = new AudioContext();
-    } else {
-      throw 'AudioContext is not supported in this browser.';
-    }
-    onPitch = f;
+    // if (isAudioContextSupported()) {
+    audioContext = new AudioContext();
+    // } else {
+    //   throw 'AudioContext is not supported in this browser.';
+    // }
+    onPitch = onPitchDetected;
   }
 
   return { init, start, stop };
