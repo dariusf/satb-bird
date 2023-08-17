@@ -23,10 +23,44 @@
         display: grid;
         justify-content: center;
       }
+
+      .tab-bar {
+        border: 1px solid #ccc;
+        /* width: 200px; */
+      }
+      .tab-bar button {
+        background-color: inherit;
+        /* float: left; */
+        border: none;
+        outline: none;
+        cursor: pointer;
+        /* padding: 14px 16px; */
+        /* transition: 0.3s; */
+        font-size: 1em;
+      }
+
+      /* .tab-bar button:hover {
+        text-decoration: underline;
+      } */
+
+      .tab-bar button.active {
+        text-decoration: underline;
+        /* font-weight: bold; */
+      }
+
+      .tabcontent {
+        display: none;
+        /* width: 200px; */
+        height: 50px;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+      }
     </style>
   </head>
 
   <body style="margin: 0; padding: 0">
+    <!-- title -->
     <div class="container">
       <div style="height: 100px; width: 500px">
         <svg style="max-width: 100%; max-height: 100%" id="title-text" viewBox="0 0 500 100">
@@ -36,33 +70,68 @@
           </text>
         </svg>
       </div>
-      <canvas id="flappy" style="display: none"></canvas>
-      <div class="container" id="app">
-        <fieldset style="display: inline">
-          <legend>Game</legend>
-          <input accept=".musicxml,.xml,.mid,.midi" onChange="loadScore(this)" type="file" />
-          <br />
-          <div id="part-loaded"></div>
-          <template id="part-container">
-            <fieldset>
-              <legend></legend>
-            </fieldset>
-          </template>
-          <template id="part-player">
-            <div style="display: grid; grid-template-columns: 3fr 2fr">
-              <div style="display: inline-block">
-                <div class="name"></div>
-                <div class="info"></div>
-              </div>
-              <div style="vertical-align: top; display: flex; align-items: flex-start; justify-content: flex-end">
-                <button data-part="" onclick="previewOnePart(this)">⏵</button>
-                <button data-part="" onclick="stopPreviewingParts()">⏹</button>
-                <button data-part="" onclick="startGame(this)">play</button>
-              </div>
-            </div>
-          </template>
-        </fieldset>
+    </div>
+    <canvas id="flappy" style="display: none"></canvas>
+    <!-- controls -->
+    <div class="container" id="app">
+      <div style="min-width: 400px">
+        <div class="tab-bar">
+          <button class="default-open tablinks" onclick="switchToTab(event, 'tab-example')">Example</button>
+          <button class="tablinks" onclick="switchToTab(event, 'tab-musicxml')">MusicXML</button>
+          <!-- <button class="tablinks" onclick="switchToTab(event, 'tab-url')">URL</button> -->
+        </div>
+        <div id="tab-example" class="tabcontent">
+          <select onchange="loadExample(this)">
+            <option>-</option>
+            <option value="Joy_to_the_World.musicxml">Joy to the World</option>
+            <option value="If_Ye_Love_Me.musicxml">If Ye Love Me</option>
+          </select>
+        </div>
+        <div id="tab-musicxml" class="tabcontent">
+          <input accept=".musicxml,.xml,.mid,.midi" onChange="loadScoreFile(this)" type="file" />
+        </div>
+        <!-- <div id="tab-url" class="tabcontent">
+        <p>url</p>
+      </div> -->
       </div>
+
+      <script>
+        function switchToTab(evt, tabEltId) {
+          var i, tabcontent, tablinks;
+          tabcontent = document.getElementsByClassName('tabcontent');
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = 'none';
+          }
+          tablinks = document.getElementsByClassName('tablinks');
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(' active', '');
+          }
+          document.getElementById(tabEltId).style.display = 'block';
+          evt.currentTarget.className += ' active';
+        }
+        document.querySelector('.default-open').click();
+      </script>
+
+      <div style="margin-top: 10px" id="part-loaded"></div>
+      <template id="part-container">
+        <fieldset>
+          <legend></legend>
+          <div class="info"></div>
+        </fieldset>
+      </template>
+      <template id="part-player">
+        <div style="margin-top: 10px; display: grid; grid-template-columns: 3fr 2fr">
+          <div style="display: inline-block">
+            <div class="name"></div>
+            <div class="info"></div>
+          </div>
+          <div style="vertical-align: top; display: flex; align-items: flex-start; justify-content: flex-end">
+            <button data-part="" onclick="previewOnePart(this)">⏵</button>
+            <button data-part="" onclick="stopPreviewingParts()">⏹</button>
+            <button data-part="" onclick="startGame(this)">start game</button>
+          </div>
+        </div>
+      </template>
     </div>
 
     <!-- <script type="text/javascript" src="https://unpkg.com/tone@13.8.25/build/Tone.js"></script> -->

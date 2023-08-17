@@ -83,6 +83,9 @@ MusicXML.init((score) => {
   let container = template.content.cloneNode(true);
   let legend = container.querySelector('legend');
   legend.textContent = score.name;
+  let songInfo = container.querySelector('.info');
+  let tempoRef = Object.keys(score.parts)[0];
+  songInfo.innerHTML = `<div>${score.composer}</div><div>♩=${score.parts[tempoRef].tempo}</div>`;
 
   for (const p in score.parts) {
     let template = document.querySelector('#part-player');
@@ -90,7 +93,7 @@ MusicXML.init((score) => {
     elt.querySelector('.name').textContent = p;
     elt.querySelector(
       '.info'
-    ).textContent = `♩=${score.parts[p].tempo}, ${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`;
+    ).textContent = `${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`;
     elt.querySelectorAll('button').forEach((b) => (b.dataset.part = p));
     legend.parentNode.appendChild(elt);
   }
@@ -102,8 +105,15 @@ MusicXML.init((score) => {
   }
 });
 
-function loadScore(e) {
+function loadScoreFile(e) {
   MusicXML.readFile(e.files[0]);
+}
+
+function loadExample(s) {
+  if (!s.value) {
+    return;
+  }
+  MusicXML.loadScoreURL(s.value);
 }
 
 async function startGame(btn) {

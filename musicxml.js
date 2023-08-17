@@ -86,15 +86,31 @@ let MusicXML = (function () {
       );
 
       // 2/2, 4/4, etc.
-      var beats = Number.parseInt(
-        toList(data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/time/beats/text()', data))[0]
-          .data
-      );
-      var beatType = Number.parseInt(
-        toList(
-          data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/time/beat-type/text()', data)
-        )[0].data
-      );
+      var beats = 4;
+      try {
+        beats = Number.parseInt(
+          toList(
+            data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/time/beats/text()', data)
+          )[0].data
+        );
+      } catch (e) {}
+
+      var beatType = 4;
+      try {
+        beatType = Number.parseInt(
+          toList(
+            data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/time/beat-type/text()', data)
+          )[0].data
+        );
+      } catch (e) {}
+
+      // quarter note = 120 bpm; musescore's default
+      // var tempo = 120;
+      var tempo = 80;
+
+      try {
+        tempo = +data.evaluate('/score-partwise/part/measure/direction/sound/@tempo', data).iterateNext().value;
+      } catch (e) {}
 
       function list(xs) {
         return Array.prototype.slice.call(xs);
@@ -103,9 +119,6 @@ let MusicXML = (function () {
       function nav(elt, tag) {
         return list(elt.children).filter((c) => c.tagName === tag);
       }
-
-      // TODO tempo is absent from the data, so this needs to be specified somewhere. or read from graphical markings. which then require changes to be handled
-      var tempo = 120; // quarter note = 120 bpm; musescore's default
 
       // get notes from measures
       var notes = list(measures).map((m) =>
