@@ -118,15 +118,18 @@ let { gameStart, handleInput } = (function () {
       return true;
     }
     for (var i in pipes) {
-      if (
-        !(
-          this.x > pipes[i].x + pipes[i].width ||
-          this.x + this.width < pipes[i].x ||
-          this.y > pipes[i].y + pipes[i].height ||
-          this.y + this.height < pipes[i].y
-        )
-      ) {
-        return true;
+      let { top, bot } = pipes[i];
+      for (let p in [top, bot]) {
+        if (
+          !(
+            this.x > p.x + p.width ||
+            this.x + this.width < p.x ||
+            this.y > p.y + p.height ||
+            this.y + this.height < p.y
+          )
+        ) {
+          return true;
+        }
       }
     }
   };
@@ -320,30 +323,18 @@ let { gameStart, handleInput } = (function () {
 
     // odd elements are top pipes and their x y is at the bottom left,
     // whereas even elements have their x y at the top left
-    this.pipes.push(new Pipe({ x: this.width, y: 0, height: holeTLY }));
-    this.pipes.push(
-      new Pipe({
+    this.pipes.push({
+      top: new Pipe({ x: this.width, y: 0, height: holeTLY }),
+      bot: new Pipe({
         x: this.width,
         y: holeTLY + holeHeight,
         height: this.height,
-      })
-    );
+      }),
+    });
   };
 
   Game.prototype.update = function () {
     this.backgroundx += this.backgroundSpeed;
-
-    // var nextHoll = 0; // fraction of the screen up the next hole will be at
-    // if (this.birds.length > 0) {
-    //   for (var i = 0; i < this.pipes.length; i += 2) {
-    //     // TODO bug here. will miss pipes. also with score, is finite
-    //     // once the bird is completely to the right of a pipe
-    //     if (this.pipes[i].x + this.pipes[i].width > this.birds[0].x) {
-    //       nextHoll = this.pipes[i].height / this.height;
-    //       break;
-    //     }
-    //   }
-    // }
 
     // flap (or sing)
     for (var pipe in this.birds) {
@@ -362,8 +353,9 @@ let { gameStart, handleInput } = (function () {
 
     // move and remove pipes
     for (var pipe = 0; pipe < this.pipes.length; pipe++) {
-      this.pipes[pipe].update();
-      if (this.pipes[pipe].isOut()) {
+      this.pipes[pipe].top.update();
+      this.pipes[pipe].bot.update();
+      if (this.pipes[pipe].top.isOut()) {
         this.pipes.splice(pipe, 1);
         pipe--;
       }
@@ -433,24 +425,16 @@ let { gameStart, handleInput } = (function () {
     }
 
     for (let i in this.pipes) {
-      if (i % 2 == 0) {
-        // drawImage(img, x, y, width, height)
-        this.ctx.drawImage(
-          images.pipetop,
-          this.pipes[i].x,
-          this.pipes[i].y + this.pipes[i].height - images.pipetop.height,
-          this.pipes[i].width,
-          images.pipetop.height
-        );
-      } else {
-        this.ctx.drawImage(
-          images.pipebottom,
-          this.pipes[i].x,
-          this.pipes[i].y,
-          this.pipes[i].width,
-          images.pipetop.height
-        );
-      }
+      let { top, bot } = this.pipes[i];
+      // drawImage(img, x, y, width, height)
+      this.ctx.drawImage(
+        images.pipetop,
+        top.x,
+        top.y + top.height - images.pipetop.height,
+        top.width,
+        images.pipetop.height
+      );
+      this.ctx.drawImage(images.pipebottom, bot.x, bot.y, bot.width, images.pipetop.height);
     }
 
     let debug = false;
