@@ -330,6 +330,8 @@ let { gameStart, handleInput } = (function () {
         y: holeTLY + holeHeight,
         height: this.height,
       }),
+      note: pipe.note,
+      hole: pipe.y,
     });
   };
 
@@ -425,7 +427,7 @@ let { gameStart, handleInput } = (function () {
     }
 
     for (let i in this.pipes) {
-      let { top, bot } = this.pipes[i];
+      let { top, bot, hole, note } = this.pipes[i];
       // drawImage(img, x, y, width, height)
       this.ctx.drawImage(
         images.pipetop,
@@ -434,6 +436,12 @@ let { gameStart, handleInput } = (function () {
         top.width,
         images.pipetop.height
       );
+      this.ctx.save();
+      this.ctx.fillStyle = '#000';
+      this.ctx.font = '30px serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(note.lyrics ?? '', top.x + top.width / 2, hole);
+      this.ctx.restore();
       this.ctx.drawImage(images.pipebottom, bot.x, bot.y, bot.width, images.pipetop.height);
     }
 
