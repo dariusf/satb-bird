@@ -20,19 +20,19 @@ let MusicXML = (function () {
     // url can be relative to load from the repo
     const response = await fetch(url);
     const str = await response.text();
-    onMusicXMLLoad(onScoreLoaded, str);
+    onMusicXMLLoad(url.split('/').pop(), onScoreLoaded, str);
     // TODO error-handling
   }
 
-  function readFile(name) {
+  function readFile(file) {
     var reader = new FileReader();
     reader.onload = () => {
-      onMusicXMLLoad(onScoreLoaded, reader.result);
+      onMusicXMLLoad(file.name, onScoreLoaded, reader.result);
     };
-    reader.readAsText(name);
+    reader.readAsText(file);
   }
 
-  function onMusicXMLLoad(resolve, data) {
+  function onMusicXMLLoad(name, resolve, data) {
     if (typeof data === 'string') {
       const parser = new DOMParser();
       data = parser.parseFromString(data, 'application/xml');
@@ -42,8 +42,26 @@ let MusicXML = (function () {
       console.log('not a valid format:', (data && data.constructor) || data);
     }
 
-    var name = 'title'; // data.evaluate('/score-partwise/work/work-title/text()', data).iterateNext().data;
-    var composer = 'composer'; // data.evaluate('/score-partwise/identification/creator/text()', data).iterateNext().data;
+    try {
+      name = data.evaluate('/score-partwise/work/work-title/text()', data).iterateNext().data;
+    } catch (e) {
+      try {
+        name = data
+          .evaluate('/score-partwise/credit[credit-type = "title"]/credit-words/text()', data)
+          .iterateNext().data;
+      } catch (e) {}
+    }
+
+    var composer = 'Unknown';
+    try {
+      composer = data.evaluate('/score-partwise/identification/creator/text()', data).iterateNext().data;
+    } catch (e) {
+      try {
+        composer = data
+          .evaluate('/score-partwise/credit[credit-type = "composer"]/credit-words/text()', data)
+          .iterateNext().data;
+      } catch (e) {}
+    }
 
     var parts = toList(data.evaluate('/score-partwise/part-list/score-part', data)).map((p) => ({
       id: p.id,
