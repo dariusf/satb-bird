@@ -125,6 +125,10 @@ function loadExample(s) {
   MusicXML.loadScoreURL(s.value);
 }
 
+function isNote(n) {
+  return !!freqTable[440].filter((m) => m.note === n);
+}
+
 async function startGame(btn) {
   stopPreviewingParts();
 
@@ -132,6 +136,8 @@ async function startGame(btn) {
   console.log('generating level using', part);
 
   Autocorrelation.init((nc) => {
+    // this is expensive
+    shaped(nc, { note: nullOr(isNote), cents: nullOr(Number) });
     if (nc.note) {
       console.log('pitch', nc);
       handleInput(nc.note);

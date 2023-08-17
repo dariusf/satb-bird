@@ -26,7 +26,7 @@
 // https://www.contractsjs.org/
 // https://codemix.github.io/contractual/
 
-let { shaped, oneOf, objMap, pred, any, func } = (function () {
+let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   function Disj(left, right) {
     this.left = left;
     this.right = right;
@@ -47,6 +47,10 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
 
   function Any() {}
 
+  function NullOr(p) {
+    this.pred = p;
+  }
+
   function _toString(o) {
     if (o === Number || o === String || o === Boolean) {
       return o.name;
@@ -66,6 +70,8 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
       return `func(${o.args.map(_toString).join(',')}, ${_toString(o.ret)})`;
     } else if (o instanceof Any) {
       return 'any';
+    } else if (o instanceof NullOr) {
+      return `nullOr(${o.pred})`;
     } else if (typeof o === 'object') {
       let keys = Object.keys(o)
         .map((k) => k + ': ' + _toString(o[k]))
@@ -76,7 +82,7 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
     }
   }
 
-  function _shape(obj, pattern, path) {
+  function checkShape(obj, pattern, path) {
     // console.debug(obj, pattern, path);
     if (
       (typeof obj === 'string' && pattern === String) ||
@@ -88,16 +94,16 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
       // we're good
       return obj;
     } else if (Array.isArray(obj) && Array.isArray(pattern)) {
-      return obj.map((o) => _shape(o, pattern[0], [...path, 'array values']));
+      return obj.map((o) => checkShape(o, pattern[0], [...path, 'array values']));
     } else if (pattern instanceof Disj) {
       try {
-        return _shape(obj, pattern.left, [...path, 'left']);
+        return checkShape(obj, pattern.left, [...path, 'left']);
       } catch (_e) {
-        return _shape(obj, pattern.right, [...path, 'right']);
+        return checkShape(obj, pattern.right, [...path, 'right']);
       }
     } else if (typeof obj === 'object' && pattern instanceof ObjWithValues) {
       // TODO from here on, return so func is handled
-      Object.keys(obj).forEach((k) => _shape(obj[k], pattern.pred, [...path, `values of key ${k}`]));
+      Object.keys(obj).forEach((k) => checkShape(obj[k], pattern.pred, [...path, `values of key ${k}`]));
     } else if (obj instanceof Function && pattern instanceof Func) {
       // good
     } else if (pattern instanceof Pred && pattern.pred(obj)) {
@@ -106,9 +112,13 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
       // good
     } else if (pattern instanceof Any) {
       // all good
+    } else if (obj === null && pattern instanceof NullOr) {
+      // all good
+    } else if (obj !== null && pattern instanceof NullOr) {
+      checkShape(obj, pattern.pred, [...path, 'null or']);
     } else if (typeof obj === 'object' && typeof pattern === 'object') {
       Object.keys(pattern).forEach((k) => {
-        _shape(obj[k], pattern[k], [...path, `[${k}]`]);
+        checkShape(obj[k], pattern[k], [...path, `[${k}]`]);
       });
     } else {
       throw {
@@ -121,7 +131,7 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
   function shaped(obj, pattern) {
     try {
       let path = [];
-      return _shape(obj, pattern, path);
+      return checkShape(obj, pattern, path);
     } catch (e) {
       // the top-level error involving obj and pattern is often so large as to be useless
       // throw _toString(obj) + ' is not of type ' + _toString(pattern) + ' (' + _e + ')';
@@ -148,6 +158,10 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
 
   let any = new Any();
 
+  function nullOr(p) {
+    return new NullOr(p);
+  }
+
   // some tests...
   function shouldFail(f) {
     try {
@@ -172,5 +186,5 @@ let { shaped, oneOf, objMap, pred, any, func } = (function () {
   );
   // );
 
-  return { shaped, oneOf, objMap, pred, any, func };
+  return { shaped, oneOf, objMap, pred, any, func, nullOr };
 })();
