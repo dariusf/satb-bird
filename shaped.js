@@ -197,8 +197,8 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     return new Proxy(
       {},
       {
-        get: function (target, name) {
-          return (obj, _) => obj;
+        get: function (_target, _name) {
+          return (obj, _pat) => obj;
         },
       }
     );

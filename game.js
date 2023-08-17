@@ -222,29 +222,16 @@ let { gameStart, handleInput } = (function () {
       return;
     }
 
-    // var part = score.parts.Bass || score.parts[Object.keys(score.parts)[Object.keys(score.parts).length - 1]];
     let part = PART;
-
-    // var bps = (part.tempo / 60) * (part.time[1] / 4);
-    // var frames_per_beat = FPS / bps;
-    // // TODO instead of doing this, offset the pipe backwards by the difference
-    // frames_per_beat = Math.floor(frames_per_beat);
-    // var divs_per_bar = part.divisions * (4 / part.time[1]) * part.time[0];
-    // this.divisions_per_frame = divs_per_bar / part.time[0] / frames_per_beat;
-
-    // this.divisions_per_frame = 1 / this.divisions_per_frame;
-
-    // TODO determine range from score
-    // new Set(score.parts.Tenor.notes.flatMap(n => n).filter(n => !n.rest).map(n => n.pitch.note + n.pitch.octave))
 
     // compute time offsets for where the pipes should be
     let pipePositions = [];
     let time = 0;
     for (const n of part.notes.flat()) {
-      let tpb = 1 / (part.tempo / 60) / 4; // quar/min -> quar/sec -> sec/quar -> sec/16th
+      let dur = durationToTime(part.tempo, part.divisions, n.duration);
 
       let start = time;
-      time += tpb * n.duration;
+      time += dur;
       let end = time;
 
       // TODO what to do about long notes? multiple pipes? one giant pipe? start and end?

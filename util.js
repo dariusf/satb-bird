@@ -49,34 +49,21 @@ function rotate(n, a) {
   return a.slice(a.length - n).concat(a.slice(0, a.length - n));
 }
 
-// (function() {
-//   var range = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-//   // TODO the default tone should be the same one as this
-
-//   // var data = {
-//   //   'C': 11,
-//   //   'C#': 10,
-//   //   'D': 9,
-//   //   'D#': 8,
-//   //   'E': 7,
-//   //   'F': 6,
-//   //   'F#': 5,
-//   //   'G': 4,
-//   //   'G#': 3,
-//   //   'A': 2,
-//   //   'A#': 1,
-//   //   'B': 0,
-//   // };
-
-//   range = rotate(6, range).reverse();
-
-//   var notePositions = {};
-//   range.forEach((e, i) => {
-//     notePositions[e] = i;
-//   });
-
-//   window.notePositions = notePositions;
-// })();
-
 const epsilon = 0.00001;
+
+/*
+  Time in MusicXML:
+
+  - tempo is given in quarter notes per minute
+  - each measure has divisions (per quarter note), allowing a single number to represent duration while retaining a rational representation
+  - duration is given in number of divisions
+  - ties need to be taken into account
+  - metronome element is visual but gives the familiar crochet = number notation
+  - dots are purely visual, the duration is already changed
+*/
+function durationToTime(tempo, divisions, duration) {
+  let tpb = 1 / (tempo / 60) / divisions;
+  let dur = tpb * duration;
+  // bpm -> b/s -> s/b -> s/d -> s
+  return dur;
+}

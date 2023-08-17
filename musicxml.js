@@ -79,7 +79,8 @@ let MusicXML = (function () {
 
       // TODO assumes only one timing throughout
 
-      // each quarter note is 4 divisions, this changes per measure
+      // e.g. each quarter note is 4 divisions
+      // this changes per measure
       var divisions = Number.parseInt(
         toList(data.evaluate('/score-partwise/part[@id="' + p.id + '"]/measure/attributes/divisions/text()', data))[0]
           .data
@@ -104,7 +105,9 @@ let MusicXML = (function () {
         );
       } catch (e) {}
 
-      // quarter note = 120 bpm; musescore's default
+      // https://stackoverflow.com/questions/62360949/get-the-tempos-of-a-parsed-musicxml-file
+      // quarter notes/minute
+      // musescore's default is 120 bpm
       // var tempo = 120;
       var tempo = 80;
 
@@ -125,8 +128,9 @@ let MusicXML = (function () {
         list(m.children)
           .filter((e) => e.tagName === 'note')
           .map((n) => {
-            var res = {
-              duration: Number.parseInt(nav(n, 'duration')[0].textContent),
+            let duration = Number.parseInt(nav(n, 'duration')[0].textContent);
+            let res = {
+              duration,
             };
             var rest = nav(n, 'rest').length != 0;
             if (rest) {

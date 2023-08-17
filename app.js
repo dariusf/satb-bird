@@ -24,15 +24,14 @@ let Play = (function () {
     return oscillator;
   }
 
-  // nd is an array of [note, duration] arrays.
+  // nd is an array of [note, duration in divisions] arrays.
   // tempo is bpm, where each beat is a quarter note
-  function notes(nd, tempo, bird_delay) {
+  function notes(nd, tempo, divisions, bird_delay) {
     let audioCtx = new AudioContext();
     let currentTime = 0;
     let sources = [];
     for (const [n, d] of nd) {
-      let tpb = 1 / (tempo / 60) / 4; // quar/min -> quar/sec -> sec/quar -> sec/16th
-      let dur = tpb * d;
+      let dur = durationToTime(tempo, divisions, d);
       if (n) {
         let f = freqTable[440].filter((m) => m.note === n)[0].frequency;
         sources.push(playNote(audioCtx, f, currentTime + bird_delay, dur));
@@ -46,7 +45,7 @@ let Play = (function () {
     function conv(n) {
       return [n.pitch ? n.pitch.note + n.pitch.octave : false, n.duration];
     }
-    return notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo, bird_delay);
+    return notes(s.parts[name].notes.flat().map(conv), s.parts[name].tempo, s.parts[name].divisions, bird_delay);
   }
   return { notes, part };
 })();
