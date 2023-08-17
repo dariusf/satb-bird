@@ -453,6 +453,22 @@ let { gameStart, handleInput } = (function () {
       }
     }
 
+    let debug = false;
+
+    if (debug) {
+      this.ctx.save();
+      this.ctx.fillStyle = '#000';
+      for (let i = 0; i < PART.range.semitones; i++) {
+        // TODO need the note names in sequence to draw this
+        this.ctx.fillText(i, 100, i * (this.height / PART.range.semitones));
+      }
+      // this.ctx.beginPath();
+      // this.ctx.moveTo(10, 45);
+      // this.ctx.lineTo(180, 47);
+      // this.ctx.stroke();
+      this.ctx.restore();
+    }
+
     this.ctx.fillStyle = '#FFC600';
     this.ctx.strokeStyle = '#CE9E00';
     for (var i in this.birds) {
