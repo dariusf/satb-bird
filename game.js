@@ -439,7 +439,7 @@ let { gameStart, handleInput } = (function () {
       );
       this.ctx.save();
       this.ctx.fillStyle = '#000';
-      this.ctx.font = '30px serif';
+      this.ctx.font = '30px ui-rounded, sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.fillText(note.lyrics ?? '', top.x + top.width / 2, hole);
       this.ctx.restore();
