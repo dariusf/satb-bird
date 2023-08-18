@@ -46,10 +46,14 @@ let MusicXML = (function () {
       name = data.evaluate('/score-partwise/work/work-title/text()', data).iterateNext().data;
     } catch (e) {
       try {
-        name = data
-          .evaluate('/score-partwise/credit[credit-type = "title"]/credit-words/text()', data)
-          .iterateNext().data;
-      } catch (e) {}
+        name = data.evaluate('/score-partwise/movement-title/text()', data).iterateNext().data;
+      } catch (e) {
+        try {
+          name = data
+            .evaluate('/score-partwise/credit[credit-type = "title"]/credit-words/text()', data)
+            .iterateNext().data;
+        } catch (e) {}
+      }
     }
 
     var composer = 'Unknown';
