@@ -39,15 +39,15 @@
     </defaults>
   <credit page="1">
     <credit-type>title</credit-type>
-    <credit-words default-x="600.242" default-y="1611.21" justify="center" valign="top" font-size="22">Joy to the World</credit-words>
+    <credit-words default-x="600.242" default-y="1611.42" justify="center" valign="top" font-size="22">Joy to the World</credit-words>
     </credit>
   <credit page="1">
     <credit-type>composer</credit-type>
-    <credit-words default-x="1114.76" default-y="1511.21" justify="right" valign="bottom">George Frideric Handel</credit-words>
+    <credit-words default-x="1114.76" default-y="1511.42" justify="right" valign="top">George Frideric Handel</credit-words>
     </credit>
   <credit page="1">
     <credit-type>rights</credit-type>
-    <credit-words default-x="600.242" default-y="85.7252" justify="center" valign="bottom" font-size="9">Public Domain</credit-words>
+    <credit-words default-x="600.242" default-y="85.7252" justify="center" valign="bottom">Public Domain</credit-words>
     </credit>
   <part-list>
     <score-part id="P1">
@@ -390,7 +390,7 @@
             <left-margin>28.72</left-margin>
             <right-margin>0.00</right-margin>
             </system-margins>
-          <system-distance>93.82</system-distance>
+          <system-distance>93.06</system-distance>
           </system-layout>
         </print>
       <note default-x="91.58" default-y="-10.00">
@@ -748,7 +748,7 @@
             <left-margin>28.72</left-margin>
             <right-margin>-0.00</right-margin>
             </system-margins>
-          <system-distance>93.82</system-distance>
+          <system-distance>93.06</system-distance>
           </system-layout>
         </print>
       <note default-x="91.58" default-y="-40.00">
@@ -2609,6 +2609,10 @@
         <voice>1</voice>
         <type>quarter</type>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>Joy</text>
+          </lyric>
         </note>
       <note default-x="162.78" default-y="-349.13">
         <pitch>
@@ -2621,6 +2625,10 @@
         <dot/>
         <stem>down</stem>
         <beam number="1">begin</beam>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>to</text>
+          </lyric>
         </note>
       <note default-x="204.27" default-y="-349.13">
         <pitch>
@@ -2633,6 +2641,10 @@
         <stem>down</stem>
         <beam number="1">end</beam>
         <beam number="2">backward hook</beam>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>the</text>
+          </lyric>
         </note>
       </measure>
     <measure number="2" width="118.82">
@@ -2646,6 +2658,10 @@
         <type>quarter</type>
         <dot/>
         <stem>down</stem>
+        <lyric number="1" default-x="9.45" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>world;</text>
+          </lyric>
         </note>
       <note default-x="83.47" default-y="-369.13">
         <pitch>
@@ -2656,6 +2672,10 @@
         <voice>1</voice>
         <type>eighth</type>
         <stem>up</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>the</text>
+          </lyric>
         </note>
       </measure>
     <measure number="3" width="125.37">
@@ -2668,6 +2688,10 @@
         <voice>1</voice>
         <type>quarter</type>
         <stem>up</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>Lord</text>
+          </lyric>
         </note>
       <note default-x="66.30" default-y="-364.13">
         <pitch>
@@ -2678,6 +2702,10 @@
         <voice>1</voice>
         <type>quarter</type>
         <stem>up</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>is</text>
+          </lyric>
         </note>
       </measure>
     <measure number="4" width="116.16">
@@ -2691,6 +2719,10 @@
         <type>quarter</type>
         <dot/>
         <stem>down</stem>
+        <lyric number="1" default-x="8.98" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>come!</text>
+          </lyric>
         </note>
       <note default-x="80.80" default-y="-339.13">
         <pitch>
@@ -2702,6 +2734,10 @@
         <voice>1</voice>
         <type>eighth</type>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>Let</text>
+          </lyric>
         </note>
       </measure>
     <measure number="5" width="117.99">
@@ -2715,6 +2751,10 @@
         <type>quarter</type>
         <dot/>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>earth</text>
+          </lyric>
         </note>
       <note default-x="82.64" default-y="-334.13">
         <pitch>
@@ -2725,6 +2765,10 @@
         <voice>1</voice>
         <type>eighth</type>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>begin</syllabic>
+          <text>re</text>
+          </lyric>
         </note>
       </measure>
     <measure number="6" width="115.79">
@@ -2738,6 +2782,10 @@
         <type>quarter</type>
         <dot/>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>end</syllabic>
+          <text>ceive</text>
+          </lyric>
         </note>
       <note default-x="80.44" default-y="-329.13">
         <pitch>
@@ -2748,6 +2796,10 @@
         <voice>1</voice>
         <type>eighth</type>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>her</text>
+          </lyric>
         </note>
       </measure>
     <measure number="7" width="115.65">
@@ -2761,6 +2813,10 @@
         <type>quarter</type>
         <dot/>
         <stem>down</stem>
+        <lyric number="1" default-x="8.74" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>King;</text>
+          </lyric>
         </note>
       <note default-x="80.29" default-y="-349.13">
         <pitch>
@@ -2771,6 +2827,10 @@
         <voice>1</voice>
         <type>eighth</type>
         <stem>down</stem>
+        <lyric number="1" default-x="6.50" default-y="-47.45" relative-y="-30.00">
+          <syllabic>single</syllabic>
+          <text>Let</text>
+          </lyric>
         </note>
       </measure>
     <measure number="8" width="208.92">
