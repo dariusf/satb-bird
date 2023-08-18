@@ -135,7 +135,7 @@ async function startGame(btn) {
   function onNote(nc) {
     // this is expensive
     shaped(nc, { note: nullOr(isNote), cents: nullOr(Number) });
-    if (nc.note) {
+    if (nc.note && part.range.notes.indexOf(nc.note) > -1) {
       console.log('pitch', nc);
       handleInput(nc.note);
     }
