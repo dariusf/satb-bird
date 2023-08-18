@@ -138,7 +138,11 @@ let Autocorrelation = (function () {
   }
 
   // stream is the return value of getUserMedia
+  // idempotent and safe to call more than once
   function start(stream) {
+    if (micStream) {
+      return;
+    }
     micStream = stream;
 
     analyserAudioNode = audioContext.createAnalyser();

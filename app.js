@@ -103,7 +103,11 @@ MusicXML.init(async (score) => {
   document.querySelector('#part-loaded').replaceChildren(container);
 
   // request permission at this point, right before we start playing audio
-  micStream = await requestMicPermission();
+  if (!micStream) {
+    micStream = await requestMicPermission();
+  } else {
+    stopPreviewingParts();
+  }
 
   // preview level, rhythm-game style
   for (const p in score.parts) {
@@ -186,6 +190,7 @@ function previewOnePart(btn) {
   previewPart(btn.dataset.part);
 }
 
+// idempotent and safe to call multiple times
 function stopPreviewingParts() {
   for (const stop of previewsPlaying) {
     stop();
