@@ -24,42 +24,40 @@
         justify-content: center;
       }
 
-      .tab-bar {
-        border: 1px solid #ccc;
-        /* width: 200px; */
-      }
-      .tab-bar button {
-        margin: 3px;
+      .tab-bar button.active {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-top: solid #ccc 1px;
+        border-right: solid #ccc 1px;
+        border-left: solid #ccc 1px;
+        border-bottom: solid #fff 1px;
+        margin-bottom: -1px;
       }
 
       button {
         background-color: inherit;
-        /* float: left; */
         border: none;
         outline: none;
         cursor: pointer;
-        /* padding: 14px 16px; */
-        /* transition: 0.3s; */
         font-size: 1em;
       }
 
-      /* .tab-bar  */
       button:hover {
         text-decoration: underline;
       }
 
-      /* .tab-bar button.active { */
-      /* text-decoration: underline; */
-      /* font-weight: bold; */
-      /* } */
-
       .tabcontent {
         display: none;
-        /* width: 200px; */
         height: 50px;
         padding: 6px 12px;
         border: 1px solid #ccc;
-        border-top: none;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+
+      fieldset {
+        border-radius: 5px;
       }
     </style>
   </head>
@@ -86,7 +84,7 @@
     <div class="container" id="app">
       <div style="min-width: 400px">
         <div class="tab-bar">
-          <button class="default-open tablinks" onclick="switchToTab(event, 'tab-example')">Example</button>
+          <button class="default-open tablinks" onclick="switchToTab(event, 'tab-example')">Songs</button>
           <button class="tablinks" onclick="switchToTab(event, 'tab-musicxml')">MusicXML</button>
           <!-- <button class="tablinks" onclick="switchToTab(event, 'tab-url')">URL</button> -->
         </div>
