@@ -3,7 +3,7 @@
 let Play = (function () {
   // time is an offset from now
   // dur is an offset from time
-  function playNote(audioCtx, freq, time, dur) {
+  function playNote(audioCtx, freq, time, dur, num_parts) {
     oscillator = audioCtx.createOscillator();
     gain = audioCtx.createGain();
     // oscillator.type = 'sine';
@@ -15,7 +15,8 @@ let Play = (function () {
     gain.connect(audioCtx.destination);
 
     gain.gain.setValueAtTime(epsilon, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + time);
+    // there might be other parts playing simultaneously, so we can't play at full volume
+    gain.gain.linearRampToValueAtTime(1 / num_parts, audioCtx.currentTime + time);
     gain.gain.linearRampToValueAtTime(epsilon, audioCtx.currentTime + time + dur);
 
     oscillator.start(audioCtx.currentTime + time);
@@ -26,7 +27,9 @@ let Play = (function () {
 
   // nd is an array of [note, duration in divisions] arrays.
   // tempo is bpm, where each beat is a quarter note
-  function notes(nd, tempo, divisions, bird_delay) {
+  // num_parts is the number of voices playing concurrently,
+  // which affects the maximum gain we can use.
+  function notes(nd, tempo, divisions, bird_delay, num_parts) {
     let audioCtx = new AudioContext();
     let currentTime = 0;
     let sources = [];
@@ -34,28 +37,28 @@ let Play = (function () {
       let dur = durationToTime(tempo, divisions, d);
       if (n) {
         let f = freqTable[440].filter((m) => m.note === n)[0].frequency;
-        sources.push(playNote(audioCtx, f, currentTime + bird_delay, dur));
+        sources.push(playNote(audioCtx, f, currentTime + bird_delay, dur, num_parts));
       }
       currentTime += dur;
     }
     return () => sources.forEach((s) => s.stop(0));
   }
 
-  function part(s, name, bird_delay) {
+  function part(s, name, bird_delay, num_parts) {
     function conv(n) {
       return [n.pitch ? n.pitch.note + n.pitch.octave : false, n.duration];
     }
-    return notes(s.parts[name].notes.map(conv), s.parts[name].tempo, s.parts[name].divisions, bird_delay);
+    return notes(s.parts[name].notes.map(conv), s.parts[name].tempo, s.parts[name].divisions, bird_delay, num_parts);
   }
   return { notes, part };
 })();
 
-let lastScore;
+let LAST_SCORE;
 let micStream;
 
 MusicXML.init(async (score) => {
   console.log('musicxml loaded', score);
-  lastScore = score;
+  LAST_SCORE = score;
 
   shaped(score, {
     name: String,
@@ -111,7 +114,7 @@ MusicXML.init(async (score) => {
 
   // preview level, rhythm-game style
   for (const p in score.parts) {
-    previewPart(p);
+    previewPart(p, Object.keys(score.parts).length);
   }
 });
 
@@ -129,7 +132,7 @@ function loadExample(s) {
 async function startGame(btn) {
   stopPreviewingParts();
 
-  let part = lastScore.parts[btn.dataset.part];
+  let part = LAST_SCORE.parts[btn.dataset.part];
   console.log('generating level using', part);
 
   function onNote(nc) {
@@ -177,17 +180,18 @@ async function startGame(btn) {
       canvas.style.display = 'none';
     },
   });
-  Play.part(score, btn.dataset.part, bird_delay);
+  // play at a lower volume, so it's not jarring when compared to all parts playing initilaly
+  Play.part(score, btn.dataset.part, bird_delay, Object.keys(score.parts).length);
 }
 
 let previewsPlaying = [];
-function previewPart(p) {
-  previewsPlaying.push(Play.part(score, p, 0));
+function previewPart(p, num_parts) {
+  previewsPlaying.push(Play.part(LAST_SCORE, p, 0, num_parts));
 }
 
 function previewOnePart(btn) {
   stopPreviewingParts();
-  previewPart(btn.dataset.part);
+  previewPart(btn.dataset.part, Object.keys(LAST_SCORE.parts).length);
 }
 
 // idempotent and safe to call multiple times
