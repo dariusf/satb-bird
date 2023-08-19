@@ -59,6 +59,9 @@
       fieldset {
         border-radius: 5px;
       }
+      .responsive-width {
+        width: clamp(300px, 80vw, 400px);
+      }
     </style>
   </head>
 
@@ -82,7 +85,7 @@
     <canvas id="flappy" style="display: none"></canvas>
     <!-- controls -->
     <div class="container" id="app">
-      <div style="min-width: 400px">
+      <div class="responsive-width">
         <div class="tab-bar">
           <button class="default-open tablinks" onclick="switchToTab(event, 'tab-example')">Songs</button>
           <button class="tablinks" onclick="switchToTab(event, 'tab-musicxml')">MusicXML</button>
@@ -126,7 +129,7 @@
         document.querySelector('.default-open').click();
       </script>
 
-      <div style="margin-top: 10px" id="part-loaded"></div>
+      <div class="responsive-width" style="margin-top: 10px" id="parts-view"></div>
       <template id="part-container">
         <fieldset>
           <legend></legend>

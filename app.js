@@ -86,10 +86,10 @@ MusicXML.init(async (score) => {
   });
 
   let template = document.querySelector('#part-container');
-  let container = template.content.cloneNode(true);
-  let legend = container.querySelector('legend');
+  let partsContainer = template.content.cloneNode(true);
+  let legend = partsContainer.querySelector('legend');
   legend.textContent = score.name;
-  let songInfo = container.querySelector('.info');
+  let songInfo = partsContainer.querySelector('.info');
   let tempoRef = Object.keys(score.parts)[0];
   songInfo.innerHTML = `<div>${score.composer}</div><div>♩=${score.parts[tempoRef].tempo}</div>`;
 
@@ -103,7 +103,7 @@ MusicXML.init(async (score) => {
     elt.querySelectorAll('button').forEach((b) => (b.dataset.part = p));
     legend.parentNode.appendChild(elt);
   }
-  document.querySelector('#part-loaded').replaceChildren(container);
+  document.querySelector('#parts-view').replaceChildren(partsContainer);
 
   // request permission at this point, right before we start playing audio
   if (!micStream) {
