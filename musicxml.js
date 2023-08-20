@@ -200,7 +200,7 @@ let MusicXML = (function () {
       let ordered = notes
         .filter((n) => n.pitch)
         .map((n) => n.pitch.note + n.pitch.octave)
-        .map((n) => [n, freqTable[440].findIndex((m) => m.note == n)]);
+        .map((n) => [n, NOTE_TO_IDX[n]]);
 
       ordered.sort(([_, a], [_n, b]) => a - b);
       ordered = uniq(ordered, (x) => x[0]);
@@ -216,11 +216,8 @@ let MusicXML = (function () {
       let numOctaves = onedp(semitones / 12);
 
       // high to low, as higher notes are nearer the origin
-      let botIdx = freqTable[440].findIndex((m) => m.note === bottomNote);
-      let allNotes = freqTable[440]
-        .slice(botIdx, botIdx + semitones + 1)
-        .map((n) => n.note)
-        .reverse();
+      let botIdx = NOTE_TO_IDX[bottomNote];
+      let allNotes = NOTES_SEQ.slice(botIdx, botIdx + semitones + 1).reverse();
 
       score.parts[p.name] = {
         tempo: tempo,

@@ -4,9 +4,9 @@ let Autocorrelation = (function () {
   // https://developer.microsoft.com/en-us/microsoft-edge/testdrive/demos/webaudiotuner
 
   // TODO oscillator also specifies this
-  const baseFreq = 440;
+  // const baseFreq = 440;
 
-  let notesArray = freqTable[baseFreq];
+  let notesArray = FREQ_TABLE; // freqTable[baseFreq];
   let sourceAudioNode;
   let analyserAudioNode;
   let audioContext;

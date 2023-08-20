@@ -94,16 +94,17 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
       // we're good
       return obj;
     } else if (Array.isArray(obj) && Array.isArray(pattern)) {
-      return obj.map((o) => checkShape(o, pattern[0], [...path, 'array values']));
+      return obj.map((o, i) => checkShape(o, pattern[0], [...path, `array value at idx ${i}`]));
     } else if (pattern instanceof Disj) {
       try {
-        return checkShape(obj, pattern.left, [...path, 'left']);
+        return checkShape(obj, pattern.left, [...path, `disj ${_toString(pattern.left)}`]);
       } catch (_e) {
-        return checkShape(obj, pattern.right, [...path, 'right']);
+        return checkShape(obj, pattern.right, [...path, `disj ${_toString(pattern.right)}`]);
       }
     } else if (typeof obj === 'object' && pattern instanceof ObjWithValues) {
       // TODO from here on, return so func is handled
       Object.keys(obj).forEach((k) => checkShape(obj[k], pattern.pred, [...path, `values of key ${k}`]));
+      // TODO instanceof pattern? for user-defined classes
     } else if (obj instanceof Function && pattern instanceof Func) {
       // good
     } else if (pattern instanceof Pred && pattern.pred(obj)) {
@@ -121,7 +122,7 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
       return checkShape(obj, pattern.pred, [...path, 'null or']);
     } else if (typeof obj === 'object' && typeof pattern === 'object') {
       Object.keys(pattern).forEach((k) => {
-        checkShape(obj[k], pattern[k], [...path, `[${k}]`]);
+        checkShape(obj[k], pattern[k], [...path, `key ${k}`]);
       });
     } else {
       throw {
@@ -190,8 +191,8 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   );
   // );
 
-  // let prod = false;
-  let prod = true;
+  let prod = false;
+  // let prod = true;
 
   if (prod) {
     return new Proxy(

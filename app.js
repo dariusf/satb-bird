@@ -36,8 +36,7 @@ let Play = (function () {
     for (const [n, d] of nd) {
       let dur = durationToTime(tempo, divisions, d);
       if (n) {
-        let f = freqTable[440].filter((m) => m.note === n)[0].frequency;
-        sources.push(playNote(audioCtx, f, currentTime + bird_delay, dur, num_parts));
+        sources.push(playNote(audioCtx, NOTE_TO_FREQ[n], currentTime + bird_delay, dur, num_parts));
       }
       currentTime += dur;
     }
@@ -68,12 +67,11 @@ MusicXML.init(async (score) => {
       tempo: Number,
       time: [Number],
       notes: [
-        [
-          oneOf(
-            { duration: Number, rest: Boolean },
-            { duration: Number, pitch: { note: String, octave: Number }, lyrics: String }
-          ),
-        ],
+        oneOf(
+          { duration: Number, rest: Boolean },
+          { duration: Number, pitch: { note: String, octave: Number }, lyrics: String }
+        ),
+        ,
       ],
       range: {
         top: String,
@@ -136,7 +134,6 @@ async function startGame(btn) {
   console.log('generating level using', part);
 
   function onNote(nc) {
-    // this is expensive
     shaped(nc, { note: nullOr(isNote), cents: nullOr(Number) });
     if (nc.note && part.range.notes.indexOf(nc.note) > -1) {
       console.log('pitch', nc);

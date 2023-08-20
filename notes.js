@@ -3472,3 +3472,21 @@ let freqTable = {
     },
   ],
 };
+
+FREQ_TABLE = freqTable[440];
+shaped(FREQ_TABLE, [{ note: String, frequency: Number }]);
+
+NOTE_TO_FREQ = {};
+FREQ_TABLE.forEach((n) => (NOTE_TO_FREQ[n.note] = n.frequency));
+shaped(NOTE_TO_FREQ, objMap(Number));
+
+NOTES_SEQ = FREQ_TABLE.map((m) => m.note);
+shaped(NOTES_SEQ, [String]);
+
+NOTE_TO_IDX = {};
+NOTES_SEQ.forEach((n, i) => (NOTE_TO_IDX[n] = i));
+shaped(NOTE_TO_IDX, objMap(Number));
+
+function isNote(n) {
+  return NOTE_TO_FREQ.hasOwnProperty(n);
+}
