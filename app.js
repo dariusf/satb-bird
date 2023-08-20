@@ -103,8 +103,10 @@ MusicXML.init(async (score) => {
       '#part-player',
       '.name',
       p,
-      '.info',
-      `${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`,
+      '.info1',
+      `${score.parts[p].range.bottom}-${score.parts[p].range.top}`,
+      '.info2',
+      `${score.parts[p].range.octaves} octaves`,
       'button',
       (b) => (b.dataset.part = p)
     );
