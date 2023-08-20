@@ -83,22 +83,31 @@ MusicXML.init(async (score) => {
     }),
   });
 
-  let template = document.querySelector('#part-container');
-  let partsContainer = template.content.cloneNode(true);
-  let legend = partsContainer.querySelector('legend');
-  legend.textContent = score.name;
-  let songInfo = partsContainer.querySelector('.info');
-  let tempoRef = Object.keys(score.parts)[0];
-  songInfo.innerHTML = `<div>${score.composer}</div><div>♩=${score.parts[tempoRef].tempo}</div>`;
+  let legend;
+  let partsContainer = template(
+    '#part-container',
+    'legend',
+    (e) => {
+      legend = e;
+      e.textContent = score.name;
+    },
+    '.info',
+    (e) => {
+      let tempoRef = Object.keys(score.parts)[0];
+      e.innerHTML = `<div>${score.composer}</div><div>♩=${score.parts[tempoRef].tempo}</div>`;
+    }
+  );
 
   for (const p in score.parts) {
-    let template = document.querySelector('#part-player');
-    let elt = template.content.cloneNode(true);
-    elt.querySelector('.name').textContent = p;
-    elt.querySelector(
-      '.info'
-    ).textContent = `${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`;
-    elt.querySelectorAll('button').forEach((b) => (b.dataset.part = p));
+    let elt = template(
+      '#part-player',
+      '.name',
+      p,
+      '.info',
+      `${score.parts[p].range.bottom}-${score.parts[p].range.top} (${score.parts[p].range.octaves} octaves)`,
+      'button',
+      (b) => (b.dataset.part = p)
+    );
     legend.parentNode.appendChild(elt);
   }
   document.querySelector('#parts-view').replaceChildren(partsContainer);

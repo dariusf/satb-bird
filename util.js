@@ -67,3 +67,20 @@ function durationToTime(tempo, divisions, duration) {
   // bpm -> b/s -> s/b -> s/d -> s
   return dur;
 }
+
+function template(id, ...args) {
+  let template = document.querySelector(id);
+  let content = template.content.cloneNode(true);
+  for (var i = 0; i < args.length; i += 2) {
+    let elt = content.querySelectorAll(args[i]);
+    let act = args[i + 1];
+    if (act instanceof Function) {
+      elt.forEach(act);
+    } else if (typeof act === 'string') {
+      elt.forEach((e) => (e.textContent = args[i + 1]));
+    } else {
+      console.warn('unknown action', act);
+    }
+  }
+  return content;
+}
