@@ -1,29 +1,28 @@
 let ML5Pitch = (function () {
-  function stop() {
-    // if (sourceAudioNode && sourceAudioNode.mediaStream && sourceAudioNode.mediaStream.stop) {
-    //   sourceAudioNode.mediaStream.stop();
-    //   // TODO probably not needed?
-    //   // sourceAudioNode.mediaStream.getAudioTracks().forEach(t => t.stop());
-    // }
-    // sourceAudioNode = null;
-    // analyserAudioNode = null;
-    // window.cancelAnimationFrame(frameId);
-  }
-
   let pitchDetection;
+  let enabled = false;
+
+  function stop() {
+    enabled = false;
+  }
 
   // stream is the return value of getUserMedia
   // idempotent and safe to call more than once
   function start() {
-    pitchDetection.getPitch((err, frequency) => {
-      if (err) {
-        console.warn(err);
-      }
-      if (frequency) {
-        onPitch(interpretFreq(frequency));
-      }
-      start();
-    });
+    enabled = true;
+
+    function loop() {
+      pitchDetection.getPitch((err, frequency) => {
+        if (err) {
+          console.warn(err);
+        }
+        if (enabled && frequency) {
+          onPitch(interpretFreq(frequency));
+        }
+        loop();
+      });
+    }
+    loop();
   }
 
   function init(audioCtx, onPitchDetected, stream) {

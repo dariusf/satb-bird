@@ -3526,36 +3526,22 @@ let interpretFreq = (function () {
   let lastNote;
   let lastCents;
 
-  function throttleOutput(note, cents) {
-    if (note === lastNote && cents === lastCents) {
-      return;
+  function interpretFreq(f) {
+    if (f < 0) {
+      return null;
     }
-    lastNote = note.note;
+    let note = findClosestNote(f);
+    let cents = findCentsOffPitch(f, note.frequency);
+    note = note.note;
+
+    if (note === lastNote && cents === lastCents) {
+      return null;
+    }
+    lastNote = note;
     lastCents = lastCents;
 
-    // TODO remove all cases and have a well-defined semantics
-
-    const bug = 'F#8'; // TODO hide any note outside the calibrated range
-    if (note === '--') {
-      // onPitch();
-      return { note: null, cents: null };
-    } else if (note === bug) {
-      // onPitch();
-      return { note: null, cents: null };
-    } else {
-      return { note, cents };
-      // onPitch();
-    }
+    return { note, cents };
   }
 
-  function interpretFreq(f) {
-    if (f !== -1) {
-      var note = findClosestNote(f);
-      var cents = findCentsOffPitch(f, note.frequency);
-      return throttleOutput(note.note, cents);
-    } else {
-      return throttleOutput('--', -50);
-    }
-  }
   return interpretFreq;
 })();

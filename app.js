@@ -71,9 +71,9 @@
   };
 
   function onNote(nc) {
-    shaped(nc, { note: nullOr(isNote), cents: nullOr(Number) });
-    if (nc.note) {
-      // console.log('pitch', nc);
+    shaped(nc, nullOr({ note: isNote, cents: Number }));
+    if (nc && nc.note) {
+      console.log('pitch', nc);
       handleInput(nc.note);
     }
   }
