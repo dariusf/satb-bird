@@ -94,11 +94,11 @@ let { gameStart, handleInput } = (function () {
   };
 
   Bird.prototype.sing = function () {
-    shaped(flappyNote, nullOr(isNote));
     if (!flappyNote) {
       this.gravity = 0;
       return;
     }
+    shaped(flappyNote, isNote);
     let dest = game.noteToPosition(flappyNote);
     let speed = 12;
     let dir;
