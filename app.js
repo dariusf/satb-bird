@@ -36,15 +36,14 @@
       }),
     });
 
-    if (!audioContext) {
+    const firstTime = !audioContext;
+    if (firstTime) {
       audioContext = new AudioContext();
       Play.init(audioContext);
-    }
-
-    // request permission at this point, right before we start playing audio
-    if (!micStream) {
+      // request permission right before we start playing audio
       micStream = await requestMicPermission();
-      PitchDetection.init(audioContext, onNote, micStream);
+      await PitchDetection.init(audioContext, onNote, micStream);
+      console.log('pitch detection model loaded');
     } else {
       stopPreviewingParts();
     }
@@ -132,13 +131,12 @@
     previewPart(btn.dataset.part, Object.keys(LAST_SCORE.parts).length);
   };
 
-  // idempotent and safe to call multiple times
-  function stopPreviewingParts() {
+  window.stopPreviewingParts = function () {
     for (const stop of previewsPlaying) {
       stop();
     }
     previewsPlaying = [];
-  }
+  };
 
   function createScorePartsUI() {
     let legend;

@@ -106,5 +106,53 @@ let GameLoop = (function () {
     window.requestAnimationFrame(step);
   }
 
-  return { simple };
+  function fixed(fps, update, render) {
+    const dt = 1 / fps; // fixed frame rate
+
+    let elapsed = 0.0;
+    let accumulator = 0.0; // remainder time
+    // dt - accumulator is how much time is required until another whole physics step can be taken
+
+    let currentTime;
+
+    requestAnimationFrame((time) => {
+      currentTime = time;
+      requestAnimationFrame(loop);
+    });
+
+    function loop(now) {
+      requestAnimationFrame(loop);
+
+      // how much time was actually taken since last frame,
+      // i.e. variable dt
+      let frameTime = now - currentTime;
+
+      // cap. i guess this is ok because if we get this much stutter, we won't notice a bit of lost time. the simulation will be slower wrt the wall clock but not be incorrect
+
+      // if (frameTime > 0.25) {
+      //   frameTime = 0.25;
+      // }
+      frameTime = Math.min(frameTime, 0.25 * 1000);
+      currentTime = now;
+
+      accumulator += frameTime;
+
+      while (accumulator >= dt) {
+        // previousState = currentState;
+        update(dt / 1000, elapsed);
+        elapsed += dt;
+        accumulator -= dt;
+      }
+
+      const alpha = accumulator / dt;
+
+      // State state = currentState * alpha +
+      // previousState * (1.0 - alpha);
+
+      // update should keep track of previous state and make it accessible to render
+      render(alpha);
+    }
+  }
+
+  return { simple, fixed };
 })();

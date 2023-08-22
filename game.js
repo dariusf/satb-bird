@@ -6,44 +6,17 @@ let { gameStart, handleInput } = (function () {
   var ON_START = () => {};
 
   let PART;
-  const PIPE_SPEED = 300;
+  const PIPE_SPEED = 300; // in units per second
+  // pipe_speed * dt = how much to move per update
+  // d/s * s/f = d/f
   const BIRD_X = 140;
-  const BREATHING_TIME = 5;
   const BIRD_SPEED = 900;
+
+  const BREATHING_TIME = 5;
 
   let flappyNote;
 
-  // why is this useful? see:
-  // https://dbaron.org/log/20100309-faster-timeouts
-  (function () {
-    var timeouts = [];
-    var messageName = 'zero-timeout-message';
-
-    function setZeroTimeout(fn) {
-      timeouts.push(fn);
-      window.postMessage(messageName, '*');
-    }
-
-    function handleMessage(event) {
-      if (event.source == window && event.data == messageName) {
-        event.stopPropagation();
-        if (timeouts.length > 0) {
-          var fn = timeouts.shift();
-          fn();
-        }
-      }
-    }
-
-    window.addEventListener('message', handleMessage, true);
-
-    window.setZeroTimeout = setZeroTimeout;
-  })();
-
   var game;
-  var FPS = 60;
-  // var SPF = 1 / FPS;
-  // let MSPF = 1000 * SPF;
-  // var maxScore = 0;
 
   var images = {};
 
@@ -181,7 +154,7 @@ let { gameStart, handleInput } = (function () {
 
     // the amount of time in seconds for a pipe spawning at the right edge to reach the bird.
     // also the amount of time by which to delay the music.
-    this.bird_to_right_edge_time = (this.width - BIRD_X) / (PIPE_SPEED * FPS);
+    this.bird_to_right_edge_time = (this.width - BIRD_X) / PIPE_SPEED;
 
     // only used for random pipe mode
     this.spawnInterval = NO_PIPES ? Number.MAX_VALUE : 90;
@@ -474,10 +447,10 @@ let { gameStart, handleInput } = (function () {
     // this.ctx.fillText("Generation : "+this.generation, 10, 75);
     // this.ctx.fillText("Alive : "+this.alives+" / "+Neuvol.options.population, 10, 100);
 
-    var self = this;
-    requestAnimationFrame(function () {
-      self.display();
-    });
+    // var self = this;
+    // requestAnimationFrame(function () {
+    //   self.display();
+    // });
   };
 
   window.onload = function () {
@@ -501,23 +474,30 @@ let { gameStart, handleInput } = (function () {
     game = new Game();
     game.start();
 
-    GameLoop.simple((dt) => {
-      game.update(dt);
-    });
-    game.display();
+    // GameLoop.simple((dt) => {
+    //   game.update(dt);
+    // });
+    // game.display();
+    GameLoop.fixed(
+      60,
+      (dt) => {
+        game.update(dt);
+      },
+      (_alpha) =>
+        // TODO
+        game.display()
+    );
     return game.bird_to_right_edge_time;
   }
 
   let notesInRange;
   function handleInput(note) {
-    if (PART.range.notes.indexOf(note) > -1) {
-      if (!notesInRange) {
-        notesInRange = {};
-        PART.range.notes.forEach((n) => (notesInRange[n] = true));
-      }
-      if (notesInRange[note]) {
-        flappyNote = note;
-      }
+    if (!notesInRange) {
+      notesInRange = {};
+      PART.range.notes.forEach((n) => (notesInRange[n] = true));
+    }
+    if (notesInRange[note]) {
+      flappyNote = note;
     }
   }
 

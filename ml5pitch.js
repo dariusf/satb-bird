@@ -6,8 +6,6 @@ let ML5Pitch = (function () {
     enabled = false;
   }
 
-  // stream is the return value of getUserMedia
-  // idempotent and safe to call more than once
   function start() {
     enabled = true;
 
@@ -25,14 +23,12 @@ let ML5Pitch = (function () {
     loop();
   }
 
-  function init(audioCtx, onPitchDetected, stream) {
+  async function init(audioCtx, onPitchDetected, stream) {
     audioContext = audioCtx;
     onPitch = onPitchDetected;
     micStream = stream;
 
-    pitchDetection = ml5.pitchDetection('./model', audioContext, micStream, () => {
-      console.log('pitch detection model loaded');
-    });
+    pitchDetection = await ml5.pitchDetection('./model', audioContext, micStream);
   }
 
   return { init, start, stop };

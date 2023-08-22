@@ -81,8 +81,6 @@ let Autocorrelation = (function () {
     window.cancelAnimationFrame(frameId);
   }
 
-  // stream is the return value of getUserMedia
-  // idempotent and safe to call more than once
   function start() {
     analyserAudioNode = audioContext.createAnalyser();
     analyserAudioNode.fftSize = 2048;
@@ -93,7 +91,7 @@ let Autocorrelation = (function () {
     detectPitch();
   }
 
-  function init(audioCtx, onPitchDetected, stream) {
+  async function init(audioCtx, onPitchDetected, stream) {
     // if (!isGetUserMediaSupported()) {
     //   throw (
     //     'It looks like this browser does not support getUserMedia. ' +
