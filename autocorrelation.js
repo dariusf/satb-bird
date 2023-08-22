@@ -6,15 +6,13 @@ let Autocorrelation = (function () {
   // TODO oscillator also specifies this
   // const baseFreq = 440;
 
-  let notesArray = FREQ_TABLE; // freqTable[baseFreq];
+  // let notesArray = FREQ_TABLE; // freqTable[baseFreq];
   let sourceAudioNode;
   let analyserAudioNode;
   let audioContext;
   let frameId;
 
   let micStream;
-  let lastNote;
-  let lastCents;
 
   let onPitch;
 
@@ -60,67 +58,13 @@ let Autocorrelation = (function () {
     }
   }
 
-  function findClosestNote(freq, notes) {
-    // Use binary search to find the closest note
-    var low = -1;
-    var high = notes.length;
-    while (high - low > 1) {
-      var pivot = Math.round((low + high) / 2);
-      if (notes[pivot].frequency <= freq) {
-        low = pivot;
-      } else {
-        high = pivot;
-      }
-    }
-
-    if (Math.abs(notes[high].frequency - freq) <= Math.abs(notes[low].frequency - freq)) {
-      // notes[high] is closer to the frequency we found
-      return notes[high];
-    }
-
-    return notes[low];
-  }
-
-  function findCentsOffPitch(freq, refFreq) {
-    // We need to find how far freq is from baseFreq in cents
-    var log2 = 0.6931471805599453; // Math.log(2)
-    var multiplicativeFactor = freq / refFreq;
-
-    // We use Math.floor to get the integer part and ignore decimals
-    var cents = Math.floor(1200 * (Math.log(multiplicativeFactor) / log2));
-    return cents;
-  }
-
-  function throttleOutput(note, cents) {
-    if (note === lastNote && cents === lastCents) {
-      return;
-    }
-    lastNote = note.note;
-    lastCents = lastCents;
-    const bug = 'F#8'; // TODO hide any note outside the calibrated range
-    if (note === '--') {
-      onPitch({ note: null, cents: null });
-    } else if (note === bug) {
-      onPitch({ note: null, cents: null });
-    } else {
-      onPitch({ note, cents });
-    }
-  }
-
   function detectPitch() {
     var buffer = new Uint8Array(analyserAudioNode.fftSize);
     analyserAudioNode.getByteTimeDomainData(buffer);
 
-    var fundalmentalFreq = findFundamentalFreq(buffer, audioContext.sampleRate);
+    var fundamentalFreq = findFundamentalFreq(buffer, audioContext.sampleRate);
 
-    if (fundalmentalFreq !== -1) {
-      var note = findClosestNote(fundalmentalFreq, notesArray);
-      var cents = findCentsOffPitch(fundalmentalFreq, note.frequency);
-
-      throttleOutput(note.note, cents);
-    } else {
-      throttleOutput('--', -50);
-    }
+    onPitch(interpretFreq(fundamentalFreq));
 
     frameId = window.requestAnimationFrame(detectPitch);
   }
@@ -139,12 +83,7 @@ let Autocorrelation = (function () {
 
   // stream is the return value of getUserMedia
   // idempotent and safe to call more than once
-  function start(stream) {
-    if (micStream) {
-      return;
-    }
-    micStream = stream;
-
+  function start() {
     analyserAudioNode = audioContext.createAnalyser();
     analyserAudioNode.fftSize = 2048;
 
@@ -154,7 +93,7 @@ let Autocorrelation = (function () {
     detectPitch();
   }
 
-  function init(onPitchDetected) {
+  function init(audioCtx, onPitchDetected, stream) {
     // if (!isGetUserMediaSupported()) {
     //   throw (
     //     'It looks like this browser does not support getUserMedia. ' +
@@ -162,11 +101,14 @@ let Autocorrelation = (function () {
     //   );
     // }
     // if (isAudioContextSupported()) {
-    audioContext = new AudioContext();
+    audioContext = audioCtx;
+    // new AudioContext();
     // } else {
     //   throw 'AudioContext is not supported in this browser.';
     // }
     onPitch = onPitchDetected;
+
+    micStream = stream;
   }
 
   return { init, start, stop };

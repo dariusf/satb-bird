@@ -141,7 +141,6 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
       // throw _toString(obj) + ' is not of type ' + _toString(pattern) + ' (' + _e + ')';
       throw `${e.msg}; path: ${e.path.join('/')}`;
     }
-    return true;
   }
 
   function oneOf(a, b) {

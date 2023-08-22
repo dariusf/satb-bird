@@ -3490,3 +3490,72 @@ shaped(NOTE_TO_IDX, objMap(Number));
 function isNote(n) {
   return NOTE_TO_FREQ.hasOwnProperty(n);
 }
+
+function findClosestNote(freq) {
+  // Use binary search to find the closest note
+  var low = -1;
+  var high = FREQ_TABLE.length;
+  while (high - low > 1) {
+    var pivot = Math.round((low + high) / 2);
+    if (FREQ_TABLE[pivot].frequency <= freq) {
+      low = pivot;
+    } else {
+      high = pivot;
+    }
+  }
+
+  if (Math.abs(FREQ_TABLE[high].frequency - freq) <= Math.abs(FREQ_TABLE[low].frequency - freq)) {
+    // notes[high] is closer to the frequency we found
+    return FREQ_TABLE[high];
+  }
+
+  return FREQ_TABLE[low];
+}
+
+let interpretFreq = (function () {
+  function findCentsOffPitch(freq, refFreq) {
+    // We need to find how far freq is from baseFreq in cents
+    var log2 = 0.6931471805599453; // Math.log(2)
+    var multiplicativeFactor = freq / refFreq;
+
+    // We use Math.floor to get the integer part and ignore decimals
+    var cents = Math.floor(1200 * (Math.log(multiplicativeFactor) / log2));
+    return cents;
+  }
+
+  let lastNote;
+  let lastCents;
+
+  function throttleOutput(note, cents) {
+    if (note === lastNote && cents === lastCents) {
+      return;
+    }
+    lastNote = note.note;
+    lastCents = lastCents;
+
+    // TODO remove all cases and have a well-defined semantics
+
+    const bug = 'F#8'; // TODO hide any note outside the calibrated range
+    if (note === '--') {
+      // onPitch();
+      return { note: null, cents: null };
+    } else if (note === bug) {
+      // onPitch();
+      return { note: null, cents: null };
+    } else {
+      return { note, cents };
+      // onPitch();
+    }
+  }
+
+  function interpretFreq(f) {
+    if (f !== -1) {
+      var note = findClosestNote(f);
+      var cents = findCentsOffPitch(f, note.frequency);
+      return throttleOutput(note.note, cents);
+    } else {
+      return throttleOutput('--', -50);
+    }
+  }
+  return interpretFreq;
+})();

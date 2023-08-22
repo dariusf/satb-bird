@@ -9,6 +9,7 @@ let { gameStart, handleInput } = (function () {
   const PIPE_SPEED = 5;
   const BIRD_X = 140;
   const BREATHING_TIME = 5;
+  const BIRD_SPEED = 15;
 
   let flappyNote;
 
@@ -100,9 +101,8 @@ let { gameStart, handleInput } = (function () {
     }
     shaped(flappyNote, isNote);
     let dest = game.noteToPosition(flappyNote);
-    let speed = 12;
     let dir;
-    if (Math.abs(dest - this.y) < speed) {
+    if (Math.abs(dest - this.y) < BIRD_SPEED) {
       this.y = dest;
       dir = 0;
     } else if (dest < this.y) {
@@ -110,7 +110,7 @@ let { gameStart, handleInput } = (function () {
     } else {
       dir = 1;
     }
-    this.gravity = dir * speed;
+    this.gravity = dir * BIRD_SPEED;
   };
 
   Bird.prototype.update = function () {
@@ -519,7 +519,9 @@ let { gameStart, handleInput } = (function () {
   }
 
   function handleInput(note) {
-    flappyNote = note;
+    if (PART.range.notes.indexOf(note) > -1) {
+      flappyNote = note;
+    }
   }
 
   return { gameStart, handleInput };
