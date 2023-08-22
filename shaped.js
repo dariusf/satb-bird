@@ -191,10 +191,7 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   );
   // );
 
-  let prod = false;
-  // let prod = true;
-
-  if (prod) {
+  if (!DEV) {
     return new Proxy(
       {},
       {
