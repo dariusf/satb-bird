@@ -518,9 +518,16 @@ let { gameStart, handleInput } = (function () {
     return game.bird_to_right_edge_time;
   }
 
+  let notesInRange;
   function handleInput(note) {
     if (PART.range.notes.indexOf(note) > -1) {
-      flappyNote = note;
+      if (!notesInRange) {
+        notesInRange = {};
+        PART.range.notes.forEach((n) => (notesInRange[n] = true));
+      }
+      if (notesInRange[note]) {
+        flappyNote = note;
+      }
     }
   }
 
