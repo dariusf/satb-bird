@@ -84,3 +84,27 @@ function template(id, ...args) {
   }
   return content;
 }
+
+let GameLoop = (function () {
+  let prev;
+
+  // variable tick rate, as we don't need determinism, just framerate-independence.
+  // someday, https://gafferongames.com/post/fix_your_timestep/
+  function simple(f) {
+    function step(now) {
+      if (prev !== undefined) {
+        // there is no dt on the first frame.
+        // technically we lose one frame.
+        // compensate by doubling dt on the second?
+        const dt = now - prev;
+        f(dt / 1000);
+      }
+      prev = now;
+
+      window.requestAnimationFrame(step);
+    }
+    window.requestAnimationFrame(step);
+  }
+
+  return { simple };
+})();

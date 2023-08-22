@@ -6,10 +6,10 @@ let { gameStart, handleInput } = (function () {
   var ON_START = () => {};
 
   let PART;
-  const PIPE_SPEED = 5;
+  const PIPE_SPEED = 300;
   const BIRD_X = 140;
   const BREATHING_TIME = 5;
-  const BIRD_SPEED = 15;
+  const BIRD_SPEED = 900;
 
   let flappyNote;
 
@@ -41,17 +41,11 @@ let { gameStart, handleInput } = (function () {
 
   var game;
   var FPS = 60;
-  var SPF = 1 / FPS;
-  let MSPF = 1000 * SPF;
+  // var SPF = 1 / FPS;
+  // let MSPF = 1000 * SPF;
   // var maxScore = 0;
 
   var images = {};
-
-  // this seems to be for interactively setting fps,
-  // with the most useful value being 0 for maximum speed
-  var speed = function (fps) {
-    FPS = parseInt(fps);
-  };
 
   var loadImages = function (sources, callback) {
     var nb = 0;
@@ -113,12 +107,12 @@ let { gameStart, handleInput } = (function () {
     this.gravity = dir * BIRD_SPEED;
   };
 
-  Bird.prototype.update = function () {
+  Bird.prototype.update = function (dt) {
     // gravity is really the downward velocity
     // temporarily disabled as we're not using flapping controls
     // this.gravity += this.velocity;
 
-    this.y += this.gravity;
+    this.y += this.gravity * dt;
   };
 
   Bird.prototype.isDead = function (height, pipes) {
@@ -161,8 +155,8 @@ let { gameStart, handleInput } = (function () {
     }
   };
 
-  Pipe.prototype.update = function () {
-    this.x -= this.speed;
+  Pipe.prototype.update = function (dt) {
+    this.x -= this.speed * dt;
   };
 
   Pipe.prototype.isOut = function () {
@@ -198,7 +192,7 @@ let { gameStart, handleInput } = (function () {
     // time the game will wait after the last note is passed
     this.gameEnded = BREATHING_TIME;
 
-    this.backgroundSpeed = 0.5;
+    this.backgroundSpeed = 30;
     this.backgroundx = 0;
   };
 
@@ -334,14 +328,14 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  Game.prototype.update = function () {
-    this.backgroundx += this.backgroundSpeed;
+  Game.prototype.update = function (dt) {
+    this.backgroundx += this.backgroundSpeed * dt;
 
     // flap (or sing)
     for (var pipe in this.birds) {
       if (this.birds[pipe].alive) {
         this.birds[pipe].sing();
-        this.birds[pipe].update();
+        this.birds[pipe].update(dt);
         if (this.birds[pipe].isDead(this.height, this.pipes)) {
           this.birds[pipe].alive = false;
           this.alives--;
@@ -354,8 +348,8 @@ let { gameStart, handleInput } = (function () {
 
     // move and remove pipes
     for (var pipe = 0; pipe < this.pipes.length; pipe++) {
-      this.pipes[pipe].top.update();
-      this.pipes[pipe].bot.update();
+      this.pipes[pipe].top.update(dt);
+      this.pipes[pipe].bot.update(dt);
       if (this.pipes[pipe].top.isOut()) {
         this.pipes.splice(pipe, 1);
         pipe--;
@@ -374,11 +368,11 @@ let { gameStart, handleInput } = (function () {
     } else {
       // create pipes based on score
       // this.interval += this.divisions_per_frame;
-      this.timeElapsed += 1 / FPS;
+      this.timeElapsed += dt;
       if (this.pipePositions.length === 0) {
         // we're done!
         // DEFAULT_RANDOM_PIPES = true;
-        this.gameEnded -= SPF;
+        this.gameEnded -= dt;
       } else if (this.timeElapsed > this.pipePositions[0].start) {
         var pipe = this.pipePositions.shift();
         this.spawnPipe(pipe);
@@ -392,13 +386,6 @@ let { gameStart, handleInput } = (function () {
     if (this.gameEnded < 0) {
       this.stop();
       return;
-    }
-
-    if (FPS == 0) {
-      setZeroTimeout(() => this.update());
-    } else {
-      // TODO request animation frame?
-      setTimeout(() => this.update(), MSPF);
     }
   };
 
@@ -513,7 +500,10 @@ let { gameStart, handleInput } = (function () {
     PART = part;
     game = new Game();
     game.start();
-    game.update();
+
+    GameLoop.simple((dt) => {
+      game.update(dt);
+    });
     game.display();
     return game.bird_to_right_edge_time;
   }
