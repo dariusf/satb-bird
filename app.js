@@ -3,8 +3,8 @@
   let micStream;
   let audioContext;
 
-  // let PitchDetection = Autocorrelation;
-  let PitchDetection = ML5Pitch;
+  let PitchDetection = Autocorrelation;
+  // let PitchDetection = ML5Pitch;
 
   async function onScoreLoad(score) {
     console.log('musicxml loaded', score);
@@ -68,7 +68,7 @@
   function onNote(nc) {
     shaped(nc, nullOr({ note: isNote, cents: Number }));
     if (nc && nc.note) {
-      console.log('pitch', nc);
+      console.log('pitch detected', nc);
       handleInput(nc.note);
     }
   }

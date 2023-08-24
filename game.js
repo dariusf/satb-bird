@@ -169,26 +169,6 @@ let { gameStart, handleInput } = (function () {
     this.backgroundx = 0;
   };
 
-  Game.prototype.noteToPosition = function (noteName) {
-    // ----^-----------
-    //     | padding
-    //     |
-    // ----v      ^
-    //            | hole 2
-    // ----   ^   v
-    //        | hole 1
-    // ----^  v
-    //     |
-    //     | padding (currently absent)
-    // ----v-----------
-
-    let padding = 120;
-    let notes = PART.range.notes;
-    let idx = notes.indexOf(noteName);
-    let y = ((this.height - padding * 2) / notes.length) * idx + padding;
-    return y;
-  };
-
   Game.prototype.start = function () {
     this.timeElapsed = NO_PIPES ? 1 : 0;
     this.pipes = [];
@@ -202,6 +182,13 @@ let { gameStart, handleInput } = (function () {
     }
 
     let part = PART;
+
+    // notes within the range of the part, including notes not actually sung.
+    // this must be used if the (virtual) staff should be laid out like in a score
+    this.partFullRange = NOTES_SEQ.slice(NOTE_TO_IDX[PART.range.bottom], NOTE_TO_IDX[PART.range.top] + 1).reverse();
+    this.staffLineNotes = ['F5', 'D5', 'B4', 'G4', 'E4', 'A3', 'F3', 'D3', 'B2', 'G2'].filter(
+      (n) => this.partFullRange.indexOf(n) > -1
+    );
 
     // compute time offsets for where the pipes should be,
     // and the positions of hole centres.
@@ -224,6 +211,26 @@ let { gameStart, handleInput } = (function () {
 
     this.pipePositions = pipePositions;
     // TODO time signature may change halfway
+  };
+
+  Game.prototype.noteToPosition = function (noteName) {
+    // ----^-----------
+    //     | padding
+    //     |
+    // ----v      ^
+    //            | hole 2
+    // ----   ^   v
+    //        | hole 1
+    // ----^  v
+    //     |
+    //     | padding (currently absent)
+    // ----v-----------
+
+    let padding = 50; // should be smaller than the gap between staff lines
+    let notes = this.partFullRange;
+    let idx = notes.indexOf(noteName);
+    let y = ((this.height - padding * 2) / notes.length) * idx + padding;
+    return y;
   };
 
   Game.prototype.debugPoint = function (x, y) {
@@ -385,6 +392,40 @@ let { gameStart, handleInput } = (function () {
       );
     }
 
+    // draw staff lines behind pipes
+    let renderStaffLines = false;
+    if (renderStaffLines) {
+      this.ctx.save();
+      this.ctx.lineWidth = 4;
+      this.ctx.strokeStyle = '#eeeeee';
+      this.ctx.strokeStyle = 'rgba(240, 240, 240, 0.3)';
+      for (const n of this.staffLineNotes) {
+        let y = this.noteToPosition(n);
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, y);
+        this.ctx.lineTo(this.width, y);
+        // this.ctx.font = '18px ui-rounded, sans-serif';
+        // this.ctx.fillText(n, 100, y);
+        // console.log(n, y);
+        // TODO if we render staff lines like this, they won't be evenly spaced, because actual staff lines are not evenly spaced; there may or may not be accidentals between them
+        this.ctx.stroke();
+      }
+      this.ctx.restore();
+    }
+
+    // TODO render clefs
+    // font size depends on the height between lines
+    // also needs to be offset to be positioned at the right line, or not drawn at all if not on-screen
+    let renderClef = false;
+    if (renderClef) {
+      this.ctx.save();
+      this.ctx.font = '330px ui-rounded, sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('𝄞', this.birds[0].x, this.birds[0].y);
+      this.ctx.fillText('𝄢', this.birds[0].x, this.birds[0].y);
+      this.ctx.restore();
+    }
+
     // given the positions of the graphics, compute where to draw them,
     // and also where to render lyrics
     for (let i in this.pipes) {
@@ -474,10 +515,6 @@ let { gameStart, handleInput } = (function () {
     game = new Game();
     game.start();
 
-    // GameLoop.simple((dt) => {
-    //   game.update(dt);
-    // });
-    // game.display();
     GameLoop.fixed(
       60,
       (dt) => {
