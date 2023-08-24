@@ -13,6 +13,7 @@ let { gameStart, handleInput } = (function () {
   const BIRD_SPEED = 900;
 
   const BREATHING_TIME = 5;
+  const BACKGROUND_SPEED = 30;
 
   let flappyNote;
 
@@ -61,7 +62,7 @@ let { gameStart, handleInput } = (function () {
     this.gravity = this.jump;
   };
 
-  Bird.prototype.sing = function () {
+  Bird.prototype.sing = function (dt) {
     if (!flappyNote) {
       this.gravity = 0;
       return;
@@ -69,7 +70,7 @@ let { gameStart, handleInput } = (function () {
     shaped(flappyNote, isNote);
     let dest = game.noteToPosition(flappyNote);
     let dir;
-    if (Math.abs(dest - this.y) < BIRD_SPEED) {
+    if (Math.abs(dest - this.y) < BIRD_SPEED * dt) {
       this.y = dest;
       dir = 0;
     } else if (dest < this.y) {
@@ -77,7 +78,7 @@ let { gameStart, handleInput } = (function () {
     } else {
       dir = 1;
     }
-    this.gravity = dir * BIRD_SPEED;
+    this.gravity = dir * BIRD_SPEED * dt;
   };
 
   Bird.prototype.update = function (dt) {
@@ -165,7 +166,6 @@ let { gameStart, handleInput } = (function () {
     // time the game will wait after the last note is passed
     this.gameEnded = BREATHING_TIME;
 
-    this.backgroundSpeed = 30;
     this.backgroundx = 0;
   };
 
@@ -302,12 +302,12 @@ let { gameStart, handleInput } = (function () {
   };
 
   Game.prototype.update = function (dt) {
-    this.backgroundx += this.backgroundSpeed * dt;
+    this.backgroundx += BACKGROUND_SPEED * dt;
 
     // flap (or sing)
     for (var pipe in this.birds) {
       if (this.birds[pipe].alive) {
-        this.birds[pipe].sing();
+        this.birds[pipe].sing(dt);
         this.birds[pipe].update(dt);
         if (this.birds[pipe].isDead(this.height, this.pipes)) {
           this.birds[pipe].alive = false;

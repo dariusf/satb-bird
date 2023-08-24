@@ -92,20 +92,8 @@ let Autocorrelation = (function () {
   }
 
   async function init(audioCtx, onPitchDetected, stream) {
-    // if (!isGetUserMediaSupported()) {
-    //   throw (
-    //     'It looks like this browser does not support getUserMedia. ' +
-    //     'Check <a href="http://caniuse.com/#feat=stream">http://caniuse.com/#feat=stream</a> for more info.'
-    //   );
-    // }
-    // if (isAudioContextSupported()) {
     audioContext = audioCtx;
-    // new AudioContext();
-    // } else {
-    //   throw 'AudioContext is not supported in this browser.';
-    // }
     onPitch = onPitchDetected;
-
     micStream = stream;
   }
 

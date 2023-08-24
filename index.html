@@ -146,7 +146,17 @@
           <legend></legend>
           <div class="info"></div>
         </fieldset>
+        <label style="display: none" class="pro-only">
+          <input type="number" min="-24" max="24" step="1" value="0" />
+          Transpose
+        </label>
+        <br />
+        <label>
+          <input type="checkbox" onchange="toggleProMode(this.checked)" />
+          Pro mode
+        </label>
       </template>
+
       <template id="part-player">
         <div style="margin-top: 10px; display: grid; grid-template-columns: 3fr 2fr">
           <div style="display: inline-block">
@@ -154,9 +164,10 @@
             <div style="font-size: 0.8em" class="info1"></div>
             <div style="font-size: 0.8em" class="info2"></div>
           </div>
-          <div style="vertical-align: top; display: flex; align-items: flex-start; justify-content: flex-end">
+          <div style="vertical-align: top; display: flex; justify-content: flex-end">
             <!-- <button data-part="" onclick="previewOnePart(this)">⏵</button> -->
             <!-- <button data-part="" onclick="stopPreviewingParts()">⏹</button> -->
+            <input style="display: none" class="pro-only" type="checkbox" />
             <button data-part="" onclick="previewOnePart(this)">listen</button>
             <button data-part="" onclick="stopPreviewingParts()">stop</button>
             <button data-part="" onclick="startGame(this)">play</button>
@@ -180,8 +191,8 @@
     <!-- third-party -->
     <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
 
-    <script src="util.js"></script>
     <script src="shaped.js"></script>
+    <script src="util.js"></script>
 
     <!-- pitch detection -->
     <script src="notes.js"></script>

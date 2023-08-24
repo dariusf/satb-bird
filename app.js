@@ -1,5 +1,3 @@
-// import Game from './game.js';
-
 (function () {
   let LAST_SCORE;
   let micStream;
@@ -83,8 +81,8 @@
     let part = LAST_SCORE.parts[btn.dataset.part];
     console.log('generating level using', part);
 
-    let testSinging = false;
-    // let testSinging = true;
+    // let testSinging = false;
+    let testSinging = true;
 
     if (testSinging) {
       setInterval(() => {
@@ -170,4 +168,12 @@
     }
     document.querySelector('#parts-view').replaceChildren(partsContainer);
   }
+
+  window.toggleProMode = function (on) {
+    if (on) {
+      document.querySelectorAll('.pro-only').forEach((e) => e.style.removeProperty('display'));
+    } else {
+      document.querySelectorAll('.pro-only').forEach((e) => (e.style.display = 'none'));
+    }
+  };
 })();

@@ -121,11 +121,13 @@ let GameLoop = (function () {
     });
 
     function loop(now) {
+      // now is in ms
       requestAnimationFrame(loop);
 
       // how much time was actually taken since last frame,
       // i.e. variable dt
       let frameTime = now - currentTime;
+      shaped(frameTime, (fr) => 1 <= fr);
 
       // cap. i guess this is ok because if we get this much stutter, we won't notice a bit of lost time. the simulation will be slower wrt the wall clock but not be incorrect
 
