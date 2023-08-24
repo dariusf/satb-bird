@@ -1,6 +1,9 @@
 let Play = (function () {
   let audioCtx;
 
+  // list of functions for stopping current playbac
+  let toStop = [];
+
   // time is an offset from now
   // dur is an offset from time
   function playNote(freq, time, dur, num_parts) {
@@ -12,7 +15,6 @@ let Play = (function () {
     oscillator.type = 'triangle';
     oscillator.connect(gain);
     oscillator.frequency.value = freq;
-    gain.connect(audioCtx.destination);
 
     gain.gain.setValueAtTime(epsilon, audioCtx.currentTime);
     // there might be other parts playing simultaneously, so we can't play at full volume
@@ -22,7 +24,7 @@ let Play = (function () {
     oscillator.start(audioCtx.currentTime + time);
     oscillator.stop(audioCtx.currentTime + time + dur);
 
-    return oscillator;
+    return { src: oscillator, end: gain };
   }
 
   // nd is an array of [note, duration in divisions] arrays.
@@ -31,27 +33,39 @@ let Play = (function () {
   // which affects the maximum gain we can use.
   function notes(nd, tempo, divisions, bird_delay, num_parts) {
     let currentTime = 0;
-    let sources = [];
+    let chains = [];
     for (const [n, d] of nd) {
       let dur = durationToTime(tempo, divisions, d);
       if (n) {
-        sources.push(playNote(NOTE_TO_FREQ[n], currentTime + bird_delay, dur, num_parts));
+        chains.push(playNote(NOTE_TO_FREQ[n], currentTime + bird_delay, dur, num_parts));
       }
       currentTime += dur;
     }
-    return () => sources.forEach((s) => s.stop(0));
+    return chains;
   }
 
-  function part(s, name, bird_delay, num_parts) {
+  function parts(score, parts, bird_delay) {
     function conv(n) {
       return [n.pitch ? n.pitch.note + n.pitch.octave : false, n.duration];
     }
-    return notes(s.parts[name].notes.map(conv), s.parts[name].tempo, s.parts[name].divisions, bird_delay, num_parts);
+    // even if playing only one part, play it at a lower volume, so it's not jarring when compared to all parts playing initially
+    let frac = Object.keys(score.parts).length;
+    let chains = parts.flatMap((p) =>
+      notes(score.parts[p].notes.map(conv), score.parts[p].tempo, score.parts[p].divisions, bird_delay, frac)
+    );
+    for (const c of chains) {
+      toStop.push(() => c.src.stop(0));
+      c.end.connect(audioCtx.destination);
+    }
+  }
+
+  function stop() {
+    toStop.forEach((s) => s());
   }
 
   function init(audioContext) {
     audioCtx = audioContext;
   }
 
-  return { init, notes, part };
+  return { init, notes, parts, stop };
 })();

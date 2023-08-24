@@ -47,9 +47,7 @@
     }
 
     // preview level, rhythm-game style
-    for (const p in score.parts) {
-      previewPart(p, Object.keys(score.parts).length);
-    }
+    Play.parts(score, Object.keys(score.parts), 0);
 
     createScorePartsUI();
   }
@@ -115,25 +113,16 @@
         PitchDetection.stop();
       },
     });
-    // play at a lower volume, so it's not jarring when compared to all parts playing initilaly
-    Play.part(score, btn.dataset.part, bird_delay, Object.keys(score.parts).length);
+    Play.parts(score, [btn.dataset.part], bird_delay);
   };
-
-  let previewsPlaying = [];
-  function previewPart(p, num_parts) {
-    previewsPlaying.push(Play.part(LAST_SCORE, p, 0, num_parts));
-  }
 
   window.previewOnePart = function (btn) {
     stopPreviewingParts();
-    previewPart(btn.dataset.part, Object.keys(LAST_SCORE.parts).length);
+    Play.parts(score, [btn.dataset.part], 0);
   };
 
   window.stopPreviewingParts = function () {
-    for (const stop of previewsPlaying) {
-      stop();
-    }
-    previewsPlaying = [];
+    Play.stop();
   };
 
   function createScorePartsUI() {
