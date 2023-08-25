@@ -10,7 +10,7 @@ let { gameStart, handleInput } = (function () {
   // pipe_speed * dt = how much to move per update
   // d/s * s/f = d/f
   const BIRD_X = 140;
-  const BIRD_SPEED = 900;
+  const BIRD_SPEED = 500;
 
   const BREATHING_TIME = 5;
   const BACKGROUND_SPEED = 30;
@@ -67,7 +67,7 @@ let { gameStart, handleInput } = (function () {
       this.gravity = 0;
       return;
     }
-    shaped(flappyNote, isNote);
+    shaped(flappyNote, noteCents);
     let dest = game.noteToPosition(flappyNote);
     let dir;
     if (Math.abs(dest - this.y) < BIRD_SPEED * dt) {
@@ -81,12 +81,12 @@ let { gameStart, handleInput } = (function () {
     this.gravity = dir * BIRD_SPEED * dt;
   };
 
-  Bird.prototype.update = function (dt) {
+  Bird.prototype.update = function (_dt) {
     // gravity is really the downward velocity
     // temporarily disabled as we're not using flapping controls
     // this.gravity += this.velocity;
 
-    this.y += this.gravity * dt;
+    this.y += this.gravity;
   };
 
   Bird.prototype.isDead = function (height, pipes) {
@@ -118,7 +118,6 @@ let { gameStart, handleInput } = (function () {
     this.y = 0;
     this.width = 50;
     this.height = 40;
-    this.speed = PIPE_SPEED;
 
     this.init(json);
   };
@@ -130,7 +129,7 @@ let { gameStart, handleInput } = (function () {
   };
 
   Pipe.prototype.update = function (dt) {
-    this.x -= this.speed * dt;
+    this.x -= PIPE_SPEED * dt;
   };
 
   Pipe.prototype.isOut = function () {
@@ -204,7 +203,7 @@ let { gameStart, handleInput } = (function () {
 
       if (!n.rest) {
         let noteName = n.pitch.note + n.pitch.octave;
-        let y = this.noteToPosition(noteName);
+        let y = this.noteToPosition({ note: noteName, cents: 0 });
         pipePositions.push({ start, end, y, note: n });
       }
     }
@@ -213,7 +212,7 @@ let { gameStart, handleInput } = (function () {
     // TODO time signature may change halfway
   };
 
-  Game.prototype.noteToPosition = function (noteName) {
+  Game.prototype.noteToPosition = function ({ note, cents }) {
     // ----^-----------
     //     | padding
     //     |
@@ -228,8 +227,10 @@ let { gameStart, handleInput } = (function () {
 
     let padding = 50; // should be smaller than the gap between staff lines
     let notes = this.partFullRange;
-    let idx = notes.indexOf(noteName);
-    let y = ((this.height - padding * 2) / notes.length) * idx + padding;
+    let idx = notes.indexOf(note);
+    let pipeDist = (this.height - padding * 2) / notes.length;
+    let inacc = pipeDist * (cents / 100);
+    let y = pipeDist * idx + inacc + padding;
     return y;
   };
 
@@ -400,7 +401,7 @@ let { gameStart, handleInput } = (function () {
       this.ctx.strokeStyle = '#eeeeee';
       this.ctx.strokeStyle = 'rgba(240, 240, 240, 0.3)';
       for (const n of this.staffLineNotes) {
-        let y = this.noteToPosition(n);
+        let y = this.noteToPosition({ note: n, cents: 0 });
         this.ctx.beginPath();
         this.ctx.moveTo(0, y);
         this.ctx.lineTo(this.width, y);
@@ -529,11 +530,12 @@ let { gameStart, handleInput } = (function () {
 
   let notesInRange;
   function handleInput(note) {
+    shaped(note, noteCents);
     if (!notesInRange) {
       notesInRange = {};
       PART.range.notes.forEach((n) => (notesInRange[n] = true));
     }
-    if (notesInRange[note]) {
+    if (notesInRange[note.note]) {
       flappyNote = note;
     }
   }

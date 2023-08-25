@@ -3491,6 +3491,12 @@ function isNote(n) {
   return NOTE_TO_FREQ.hasOwnProperty(n);
 }
 
+function isCents(n) {
+  return -50 <= n && n <= 50;
+}
+
+let noteCents = { note: isNote, cents: isCents };
+
 function findClosestNote(freq) {
   // Use binary search to find the closest note
   var low = -1;
@@ -3540,7 +3546,9 @@ let interpretFreq = (function () {
     lastNote = note;
     lastCents = lastCents;
 
-    return { note, cents };
+    let res = { note, cents };
+    shaped(res, noteCents);
+    return res;
   }
 
   return interpretFreq;

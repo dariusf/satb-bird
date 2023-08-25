@@ -126,22 +126,21 @@ let GameLoop = (function () {
 
       // how much time was actually taken since last frame,
       // i.e. variable dt
-      let frameTime = now - currentTime;
-      shaped(frameTime, (fr) => 1 <= fr);
+      let frameTime = (now - currentTime) / 1000;
 
       // cap. i guess this is ok because if we get this much stutter, we won't notice a bit of lost time. the simulation will be slower wrt the wall clock but not be incorrect
 
       // if (frameTime > 0.25) {
       //   frameTime = 0.25;
       // }
-      frameTime = Math.min(frameTime, 0.25 * 1000);
+      frameTime = Math.min(frameTime, 0.25);
       currentTime = now;
 
       accumulator += frameTime;
 
       while (accumulator >= dt) {
         // previousState = currentState;
-        update(dt / 1000, elapsed);
+        update(dt, elapsed);
         elapsed += dt;
         accumulator -= dt;
       }

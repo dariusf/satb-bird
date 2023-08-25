@@ -66,10 +66,10 @@
   };
 
   function onNote(nc) {
-    shaped(nc, nullOr({ note: isNote, cents: Number }));
-    if (nc && nc.note) {
+    shaped(nc, nullOr(noteCents));
+    if (nc) {
       console.log('pitch detected', nc);
-      handleInput(nc.note);
+      handleInput(nc);
     }
   }
 
@@ -83,12 +83,15 @@
     let testSinging = true;
 
     if (testSinging) {
-      setInterval(() => {
+      console.log('testing singing; all notes are synthetic!');
+      function f() {
         onNote({
           note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
-          cents: 0,
+          cents: Math.floor(Math.random() * 100 - 50),
         });
-      }, 2000);
+        setTimeout(f, Math.random() * 1000);
+      }
+      setTimeout(f, Math.random() * 1000);
     } else {
       PitchDetection.start();
     }
