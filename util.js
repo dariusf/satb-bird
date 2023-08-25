@@ -51,6 +51,10 @@ function rotate(n, a) {
 
 const epsilon = 0.00001;
 
+clamp = function (min, n, max) {
+  return Math.min(Math.max(n, min), max);
+};
+
 /*
   Time in MusicXML:
 
@@ -120,7 +124,12 @@ let GameLoop = (function () {
       requestAnimationFrame(loop);
     });
 
+    let quit = false;
+
     function loop(now) {
+      if (quit) {
+        return;
+      }
       // now is in ms
       requestAnimationFrame(loop);
 
@@ -153,6 +162,8 @@ let GameLoop = (function () {
       // update should keep track of previous state and make it accessible to render
       render(alpha);
     }
+
+    return () => (quit = true);
   }
 
   return { simple, fixed };

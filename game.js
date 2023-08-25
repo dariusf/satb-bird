@@ -9,11 +9,12 @@ let { gameStart, handleInput } = (function () {
   const PIPE_SPEED = 300; // in units per second
   // pipe_speed * dt = how much to move per update
   // d/s * s/f = d/f
-  const BIRD_X = 140;
   const BIRD_SPEED = 500;
-
-  const BREATHING_TIME = 5;
   const BACKGROUND_SPEED = 30;
+  const BIRD_ACC = 30;
+
+  const BIRD_X = 140;
+  const BREATHING_TIME = 5;
 
   let flappyNote;
 
@@ -64,29 +65,25 @@ let { gameStart, handleInput } = (function () {
 
   Bird.prototype.sing = function (dt) {
     if (!flappyNote) {
-      this.gravity = 0;
-      return;
-    }
-    shaped(flappyNote, noteCents);
-    let dest = game.noteToPosition(flappyNote);
-    let dir;
-    if (Math.abs(dest - this.y) < BIRD_SPEED * dt) {
-      this.y = dest;
-      dir = 0;
-    } else if (dest < this.y) {
-      dir = -1;
+      this.velocity = Math.max(0, this.velocity - BIRD_ACC * dt);
     } else {
-      dir = 1;
+      shaped(flappyNote, noteCents);
+      let dest = game.noteToPosition(flappyNote);
+      let dir;
+      if (Math.abs(dest - this.y) < epsilon) {
+        dir = 0;
+      } else if (dest < this.y) {
+        dir = -1;
+      } else {
+        dir = 1;
+      }
+      this.velocity += dir * BIRD_ACC * dt;
     }
-    this.gravity = dir * BIRD_SPEED * dt;
+    this.velocity = clamp(-BIRD_SPEED * dt, this.velocity, BIRD_SPEED * dt);
   };
 
   Bird.prototype.update = function (_dt) {
-    // gravity is really the downward velocity
-    // temporarily disabled as we're not using flapping controls
-    // this.gravity += this.velocity;
-
-    this.y += this.gravity;
+    this.y += this.velocity;
   };
 
   Bird.prototype.isDead = function (height, pipes) {
@@ -371,6 +368,7 @@ let { gameStart, handleInput } = (function () {
   };
 
   Game.prototype.stop = function () {
+    this.stopGameLoop();
     ON_END();
   };
 
@@ -470,7 +468,7 @@ let { gameStart, handleInput } = (function () {
       if (this.birds[i].alive) {
         this.ctx.save();
         this.ctx.translate(this.birds[i].x + this.birds[i].width / 2, this.birds[i].y + this.birds[i].height / 2);
-        this.ctx.rotate(((Math.PI / 2) * this.birds[i].gravity) / 20);
+        this.ctx.rotate(((Math.PI / 2) * this.birds[i].velocity) / 20);
         this.ctx.drawImage(
           images.bird,
           -this.birds[i].width / 2,
@@ -515,8 +513,7 @@ let { gameStart, handleInput } = (function () {
     PART = part;
     game = new Game();
     game.start();
-
-    GameLoop.fixed(
+    game.stopGameLoop = GameLoop.fixed(
       60,
       (dt) => {
         game.update(dt);
