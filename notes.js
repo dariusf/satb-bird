@@ -3496,6 +3496,22 @@ function isCents(n) {
 }
 
 let noteCents = { note: isNote, cents: isCents };
+let explicitNote = { note: String, octave: Number };
+
+function transposeNote(n, by) {
+  return NOTES_SEQ[NOTE_TO_IDX[n] + by];
+}
+
+function noteToImplicit(n) {
+  shaped(n, explicitNote);
+  return n.note + n.octave;
+}
+
+function noteToExplicit(n) {
+  shaped(n, isNote);
+  let [note, octave] = n.split(/(?=\d)/);
+  return { note, octave: +octave };
+}
 
 function findClosestNote(freq) {
   // Use binary search to find the closest note

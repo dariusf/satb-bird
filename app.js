@@ -6,10 +6,7 @@
   let PitchDetection = Autocorrelation;
   // let PitchDetection = ML5Pitch;
 
-  async function onScoreLoad(score) {
-    console.log('musicxml loaded', score);
-    LAST_SCORE = score;
-
+  function checkScore(score) {
     shaped(score, {
       name: String,
       composer: String,
@@ -25,14 +22,49 @@
           ,
         ],
         range: {
-          top: String,
-          bottom: String,
+          top: isNote,
+          bottom: isNote,
           octaves: Number,
           // semitones: Number,
-          notes: [String],
+          notes: [isNote],
         },
       }),
     });
+  }
+
+  function transposeScore(score) {
+    checkScore(score);
+    let { value } = document.querySelector('#transpose');
+    let by = +value;
+    let res = {
+      ...score,
+      parts: mapOverObject(score.parts, (_pn, p) => ({
+        ...p,
+        notes: p.notes.map((n) =>
+          n.pitch
+            ? {
+                ...n,
+                pitch: noteToExplicit(transposeNote(noteToImplicit(n.pitch), by)),
+              }
+            : n
+        ),
+        range: {
+          ...p.range,
+          top: transposeNote(p.range.top, by),
+          bottom: transposeNote(p.range.bottom, by),
+          notes: p.range.notes.map((n) => transposeNote(n, by)),
+        },
+      })),
+    };
+    checkScore(res);
+    return res;
+  }
+
+  async function onScoreLoad(score) {
+    console.log('musicxml loaded', score);
+    LAST_SCORE = score;
+
+    checkScore(score);
 
     const firstTime = !audioContext;
     if (firstTime) {
@@ -76,7 +108,10 @@
   window.startGame = async function (btn) {
     stopPreviewingParts();
 
-    let part = LAST_SCORE.parts[btn.dataset.part];
+    let score = LAST_SCORE;
+    score = transposeScore(score);
+
+    let part = score.parts[btn.dataset.part];
     console.log('generating level using', part);
 
     let noSinging = true;
@@ -127,6 +162,9 @@
 
   window.previewOnePart = function (btn) {
     stopPreviewingParts();
+
+    let score = LAST_SCORE;
+    score = transposeScore(score);
     Play.parts(score, [btn.dataset.part], 0, null);
   };
 

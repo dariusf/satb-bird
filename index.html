@@ -146,14 +146,14 @@
           <legend></legend>
           <div class="info"></div>
         </fieldset>
-        <label style="display: none" class="pro-only">
-          <input type="number" min="-48" max="48" step="1" value="0" />
-          Transpose
-        </label>
-        <br />
         <label>
           <input type="checkbox" onchange="toggleProMode(this.checked)" />
           Pro mode
+        </label>
+        <br />
+        <label style="display: none" class="pro-only">
+          <input id="transpose" type="number" min="-48" max="48" step="1" value="0" />
+          Transpose
         </label>
       </template>
 

@@ -132,14 +132,23 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     }
   }
 
+  let useDebugger = false;
+
   function shaped(obj, pattern) {
     try {
       let path = [];
       return checkShape(obj, pattern, path);
     } catch (e) {
+      let msg = `${e.msg}; path: ${e.path.join('/')}`;
+      if (useDebugger) {
+        console.error(msg);
+        debugger;
+      } else {
+        throw msg;
+      }
       // the top-level error involving obj and pattern is often so large as to be useless
       // throw _toString(obj) + ' is not of type ' + _toString(pattern) + ' (' + _e + ')';
-      throw `${e.msg}; path: ${e.path.join('/')}`;
+      // throw msg;
     }
   }
 
@@ -165,7 +174,7 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     return new NullOr(p);
   }
 
-  // some tests...
+  // some tests... uses the fact that we throw until the end of this module
   function shouldFail(f) {
     try {
       f();
@@ -190,7 +199,13 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   );
   // );
 
-  if (!DEV) {
+  if (DEV) {
+    // in dev mode, we want to start the debugger
+    useDebugger = true;
+    return { shaped, oneOf, objMap, pred, any, func, nullOr };
+  } else {
+    // in prod mode, all assertions pass.
+    // all predicate constructors are identity functions, but this is fine because they are ignored by shaped.
     return new Proxy(
       {},
       {
@@ -199,7 +214,5 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
         },
       }
     );
-  } else {
-    return { shaped, oneOf, objMap, pred, any, func, nullOr };
   }
 })();

@@ -168,3 +168,10 @@ let GameLoop = (function () {
 
   return { simple, fixed };
 })();
+
+function mapOverObject(object, f) {
+  return Object.keys(object).reduce(function (result, key) {
+    result[key] = f(key, object[key]);
+    return result;
+  }, {});
+}

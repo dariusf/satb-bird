@@ -88,7 +88,7 @@ let { gameStart, handleInput } = (function () {
         { pipe: null, dist: Infinity }
       ).pipe;
       if (pipe) {
-        flappyNote = { note: pipe.note.pitch.note + pipe.note.pitch.octave, cents: 0 };
+        flappyNote = { note: noteToImplicit(pipe.note.pitch), cents: 0 };
         // } else {
         //   flappyNote = undefined;
       }
@@ -237,8 +237,7 @@ let { gameStart, handleInput } = (function () {
       let end = time;
 
       if (!n.rest) {
-        let noteName = n.pitch.note + n.pitch.octave;
-        let y = this.noteToPosition({ note: noteName, cents: 0 });
+        let y = this.noteToPosition({ note: noteToImplicit(n.pitch), cents: 0 });
         pipePositions.push({ start, end, y, note: n });
       }
     }
