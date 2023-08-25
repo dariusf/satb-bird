@@ -47,7 +47,7 @@
     }
 
     // preview level, rhythm-game style
-    Play.parts(score, Object.keys(score.parts), 0);
+    Play.parts(score, Object.keys(score.parts), 0, null);
 
     createScorePartsUI();
   }
@@ -122,12 +122,12 @@
         PitchDetection.stop();
       },
     });
-    Play.parts(score, [btn.dataset.part], bird_delay);
+    Play.parts(score, Object.keys(score.parts), bird_delay, btn.dataset.part);
   };
 
   window.previewOnePart = function (btn) {
     stopPreviewingParts();
-    Play.parts(score, [btn.dataset.part], 0);
+    Play.parts(score, [btn.dataset.part], 0, null);
   };
 
   window.stopPreviewingParts = function () {
