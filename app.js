@@ -79,21 +79,27 @@
     let part = LAST_SCORE.parts[btn.dataset.part];
     console.log('generating level using', part);
 
+    let noSinging = true;
+    // let noSinging = false;
     // let testSinging = false;
     let testSinging = true;
 
-    if (testSinging) {
-      console.log('testing singing; all notes are synthetic!');
-      function f() {
-        onNote({
-          note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
-          cents: Math.floor(Math.random() * 100 - 50),
-        });
+    if (!noSinging) {
+      if (testSinging) {
+        console.log('testing singing; all notes are synthetic!');
+        function f() {
+          onNote({
+            note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
+            cents: Math.floor(Math.random() * 100 - 50),
+          });
+          setTimeout(f, Math.random() * 1000);
+        }
         setTimeout(f, Math.random() * 1000);
+      } else {
+        PitchDetection.start();
       }
-      setTimeout(f, Math.random() * 1000);
     } else {
-      PitchDetection.start();
+      console.log('singing disabled');
     }
 
     let app = document.querySelector('#app');

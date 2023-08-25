@@ -5,13 +5,19 @@ let { gameStart, handleInput } = (function () {
   var ON_END = () => {};
   var ON_START = () => {};
 
+  // let AI_ENABLED = false
+  let AI_ENABLED = true;
+
   let PART;
   const PIPE_SPEED = 300; // in units per second
   // pipe_speed * dt = how much to move per update
   // d/s * s/f = d/f
   const BIRD_SPEED = 500;
   const BACKGROUND_SPEED = 30;
+
+  // 30 is aesthetically pleasing but not accurate enough for leaps
   const BIRD_ACC = 30;
+  // const BIRD_ACC = 90;
 
   const BIRD_X = 140;
   const BREATHING_TIME = 5;
@@ -64,14 +70,46 @@ let { gameStart, handleInput } = (function () {
   };
 
   Bird.prototype.sing = function (dt) {
+    if (AI_ENABLED) {
+      function closestPoint(p) {
+        return p.top.x - p.top.width / 2;
+      }
+      let pipe = game.pipes.reduce(
+        (t, c) => {
+          let { dist } = t;
+          let p = closestPoint(c);
+          let d = p - this.x;
+          let upcoming = this.x <= p;
+          let nearest = d <= dist;
+          // don't react to pipes which are too close
+          let near = 50 <= d && d <= 100;
+          return near && upcoming && nearest ? { dist: d, pipe: c } : t;
+        },
+        { pipe: null, dist: Infinity }
+      ).pipe;
+      if (pipe) {
+        flappyNote = { note: pipe.note.pitch.note + pipe.note.pitch.octave, cents: 0 };
+        // } else {
+        //   flappyNote = undefined;
+      }
+    }
+
     if (!flappyNote) {
       this.velocity = Math.max(0, this.velocity - BIRD_ACC * dt);
     } else {
       shaped(flappyNote, noteCents);
       let dest = game.noteToPosition(flappyNote);
+      // use larger tolerance to prevent too much vacillating when already on a note?
+      // let eps = 100 * dt;
+      let eps = epsilon;
       let dir;
-      if (Math.abs(dest - this.y) < epsilon) {
+      if (Math.abs(dest - this.y) < eps) {
         dir = 0;
+        // if (this.velocity < 0) {
+        //   dir = 1;
+        // } else {
+        //   dir = -1;
+        // }
       } else if (dest < this.y) {
         dir = -1;
       } else {
