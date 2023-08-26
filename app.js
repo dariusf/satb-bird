@@ -3,8 +3,9 @@
   let micStream;
   let audioContext;
 
-  let PitchDetection = Autocorrelation;
+  // let PitchDetection = Autocorrelation;
   // let PitchDetection = ML5Pitch;
+  let PitchDetection = WasmPitch;
 
   function checkScore(score) {
     shaped(score, {
@@ -116,8 +117,8 @@
 
     let noSinging = true;
     // let noSinging = false;
-    // let testSinging = false;
-    let testSinging = true;
+    let testSinging = false;
+    // let testSinging = true;
 
     if (!noSinging) {
       if (testSinging) {
@@ -140,6 +141,7 @@
     let app = document.querySelector('#app');
     let canvas = document.querySelector('#flappy');
     let title = document.querySelector('#title-text').parentNode;
+    // console.log('got all stuff');
 
     let bird_delay = gameStart({
       randomPipes: false,
@@ -157,7 +159,10 @@
         PitchDetection.stop();
       },
     });
+
+    // console.log('game started');
     Play.parts(score, Object.keys(score.parts), bird_delay, btn.dataset.part);
+    // console.log('parts playing');
   };
 
   window.previewOnePart = function (btn) {

@@ -5,28 +5,23 @@ let { gameStart, handleInput } = (function () {
   var ON_END = () => {};
   var ON_START = () => {};
 
-  // let AI_ENABLED = false
+  // let AI_ENABLED = false;
   let AI_ENABLED = true;
 
   let PART;
   const PIPE_SPEED = 300; // in units per second
   // pipe_speed * dt = how much to move per update
   // d/s * s/f = d/f
-  const BIRD_SPEED = 500;
   const BACKGROUND_SPEED = 30;
-
-  // 30 is aesthetically pleasing but not accurate enough for leaps
-  const BIRD_ACC = 30;
-  // const BIRD_ACC = 90;
 
   const BIRD_X = 140;
   const BREATHING_TIME = 5;
 
   let flappyNote;
 
-  var game;
+  let game;
 
-  var images = {};
+  let images = {};
 
   var loadImages = function (sources, callback) {
     var nb = 0;
@@ -82,46 +77,70 @@ let { gameStart, handleInput } = (function () {
           let upcoming = this.x <= p;
           let nearest = d <= dist;
           // don't react to pipes which are too close
-          let near = 50 <= d && d <= 100;
+          let near = 10 <= d && d <= 40;
           return near && upcoming && nearest ? { dist: d, pipe: c } : t;
         },
         { pipe: null, dist: Infinity }
       ).pipe;
       if (pipe) {
         flappyNote = { note: noteToImplicit(pipe.note.pitch), cents: 0 };
-        // } else {
-        //   flappyNote = undefined;
       }
     }
 
-    if (!flappyNote) {
-      this.velocity = Math.max(0, this.velocity - BIRD_ACC * dt);
-    } else {
+    if (flappyNote) {
       shaped(flappyNote, noteCents);
       let dest = game.noteToPosition(flappyNote);
-      // use larger tolerance to prevent too much vacillating when already on a note?
-      // let eps = 100 * dt;
-      let eps = epsilon;
       let dir;
-      if (Math.abs(dest - this.y) < eps) {
+      if (Math.abs(dest - this.y) < epsilon) {
         dir = 0;
-        // if (this.velocity < 0) {
-        //   dir = 1;
-        // } else {
-        //   dir = -1;
-        // }
       } else if (dest < this.y) {
         dir = -1;
       } else {
         dir = 1;
       }
-      this.velocity += dir * BIRD_ACC * dt;
-    }
-    this.velocity = clamp(-BIRD_SPEED * dt, this.velocity, BIRD_SPEED * dt);
-  };
 
-  Bird.prototype.update = function (_dt) {
-    this.y += this.velocity;
+      let wobbly = () => {
+        const BIRD_SPEED = 500;
+        const BIRD_ACC = 30;
+        if (!flappyNote) {
+          this.velocity = Math.max(0, this.velocity - BIRD_ACC * dt);
+        } else {
+          this.velocity += dir * BIRD_ACC * dt;
+        }
+        this.dir = 1;
+        this.velocity = clamp(-BIRD_SPEED * dt, this.velocity, BIRD_SPEED * dt);
+        this.y += this.velocity;
+      };
+
+      // https://gamedev.stackexchange.com/questions/73627
+      let precise = () => {
+        // 30 is aesthetically pleasing but not enough for leaps
+        // const BIRD_ACC = 30;
+        const BIRD_SPEED = 1200;
+        const BIRD_ACC = 70;
+
+        // compute unsigned velocity
+        let dist = Math.abs(dest - this.y);
+        let decelDistance = (this.velocity * this.velocity) / (2 * BIRD_ACC);
+        if (dist > decelDistance) {
+          // continue accelerating
+          this.velocity = Math.min(this.velocity + BIRD_ACC * dt, BIRD_SPEED * dt);
+        } else {
+          // start decelerate
+          this.velocity = Math.max(this.velocity - BIRD_ACC * dt, 0);
+        }
+        this.dir = dir;
+
+        if (dist < this.velocity) {
+          this.y = dest;
+        } else {
+          this.y += dir * this.velocity;
+        }
+      };
+
+      // wobbly();
+      precise();
+    }
   };
 
   Bird.prototype.isDead = function (height, pipes) {
@@ -350,7 +369,7 @@ let { gameStart, handleInput } = (function () {
     for (var pipe in this.birds) {
       if (this.birds[pipe].alive) {
         this.birds[pipe].sing(dt);
-        this.birds[pipe].update(dt);
+        // this.birds[pipe].update(dt);
         if (this.birds[pipe].isDead(this.height, this.pipes)) {
           this.birds[pipe].alive = false;
           this.alives--;
@@ -505,7 +524,7 @@ let { gameStart, handleInput } = (function () {
       if (this.birds[i].alive) {
         this.ctx.save();
         this.ctx.translate(this.birds[i].x + this.birds[i].width / 2, this.birds[i].y + this.birds[i].height / 2);
-        this.ctx.rotate(((Math.PI / 2) * this.birds[i].velocity) / 20);
+        this.ctx.rotate(((Math.PI / 2) * this.birds[i].dir * this.birds[i].velocity) / 20);
         this.ctx.drawImage(
           images.bird,
           -this.birds[i].width / 2,
