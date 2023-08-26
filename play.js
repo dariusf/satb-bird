@@ -53,6 +53,7 @@ let Play = (function () {
     let chains = parts.flatMap((p) => {
       let vol;
       if (main_part === null) {
+        // https://stackoverflow.com/questions/42042995
         vol = 1 / num_parts;
       } else {
         let main = 0.5;

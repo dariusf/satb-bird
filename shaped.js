@@ -16,17 +16,16 @@
 // array, for arrays of specific things
 // object, for assertions on both keys and values
 // should objects have exactly the given keys, not just at least?
-// func for higher-order functions. we have to wrap and return them to assign blame correctly
+// variadic args for functions
 // suchThat
-// pre and post, use a func after?
 
 // Related work
 // Hamcrest (though not wrappng native predicates)
-// Contracts and blame in Racket
+// Contracts and blame in Racket https://www2.ccs.neu.edu/racket/pubs/icfp2002-ff.pdf
 // https://www.contractsjs.org/
 // https://codemix.github.io/contractual/
 
-let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
+let { shaped, oneOf, objMap, pred, any, func, nullOr, define } = (function () {
   function Disj(left, right) {
     this.left = left;
     this.right = right;
@@ -104,17 +103,27 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     } else if (typeof obj === 'object' && pattern instanceof ObjWithValues) {
       // TODO from here on, return so func is handled
       Object.keys(obj).forEach((k) => checkShape(obj[k], pattern.pred, [...path, `values of key ${k}`]));
-      // TODO instanceof pattern? for user-defined classes
-    } else if (obj instanceof Function && pattern instanceof Func) {
-      // good
-    } else if (pattern instanceof Pred && pattern.pred(obj)) {
-      // good
+    } else if (pattern instanceof Function && obj instanceof pattern) {
+      // user-defined classes, should be before arbitrary predicates
       return obj;
-    } else if (pattern instanceof Function && pattern(obj) === true) {
-      // good
+    } else if (obj instanceof Function && pattern instanceof Func) {
+      // pre/post
+      return (...args) => {
+        // as this is a simple library without a preprocessor, the caller will always be blamed for precondition failures, no matter whether the failure is due to a closed-over value (in which case the definition site should be blamed)
+        checkShape(args, pattern.args, [...path, 'func args']);
+        let res = obj(...args);
+        checkShape(res, pattern.ret, [...path, 'func ret']);
+        return res;
+      };
+    } else if (
+      (pattern instanceof Pred && pattern.pred(obj) === true) ||
+      (pattern instanceof Function && pattern(obj) === true)
+    ) {
+      // arbitrary predicates
       return obj;
     } else if (pattern instanceof Any) {
       // all good
+      return obj;
     } else if (obj === null && pattern instanceof NullOr) {
       // all good
       return null;
@@ -152,6 +161,10 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     }
   }
 
+  function define(pre, post, f) {
+    return shaped(f, func(...pre, post));
+  }
+
   function oneOf(a, b) {
     return new Disj(a, b);
   }
@@ -164,8 +177,8 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
     return new Pred(p);
   }
 
-  function func(p) {
-    return new Func(p);
+  function func(...p) {
+    return new Func(...p);
   }
 
   let any = new Any();
@@ -189,20 +202,32 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr } = (function () {
   shouldFail(() => shaped(null, String));
 
   // TODO this isn't implemented yet, just passes because it's a function
-  // shouldFail(() =>
-  shaped(
-    (_) => 1,
+  let f = shaped(
+    (_) => 3,
     func(
       (x) => x > 1,
       (x) => x % 2 === 0
     )
   );
-  // );
+  shouldFail(() => {
+    f(1);
+  });
+  shouldFail(() => {
+    f(2);
+  });
+  let g = define(
+    [(x) => x > 1],
+    (x) => x % 2 === 0,
+    (_) => 3
+  );
+  shouldFail(() => {
+    g(2);
+  });
 
   if (DEV) {
     // in dev mode, we want to start the debugger
     useDebugger = true;
-    return { shaped, oneOf, objMap, pred, any, func, nullOr };
+    return { shaped, oneOf, objMap, pred, any, func, nullOr, define };
   } else {
     // in prod mode, all assertions pass.
     // all predicate constructors are identity functions, but this is fine because they are ignored by shaped.
