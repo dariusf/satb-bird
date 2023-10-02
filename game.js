@@ -6,6 +6,7 @@ let { gameStart, handleInput } = (function () {
   var ON_START = () => {};
 
   let AI_ENABLED;
+  let MOVEMENT_KIND;
 
   let PART;
   const PIPE_SPEED = 300; // in units per second
@@ -137,8 +138,11 @@ let { gameStart, handleInput } = (function () {
         }
       };
 
-      // wobbly();
-      precise();
+      if (MOVEMENT_KIND === 'wobbly') {
+        wobbly();
+      } else {
+        precise();
+      }
     }
   };
 
@@ -561,8 +565,9 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  function gameStart({ randomPipes, part, onEnd, onStart, ai }) {
+  function gameStart({ randomPipes, part, onEnd, onStart, ai, movement }) {
     AI_ENABLED = ai;
+    MOVEMENT_KIND = movement;
     DEFAULT_RANDOM_PIPES = randomPipes;
     ON_END = onEnd;
     ON_START = onStart;

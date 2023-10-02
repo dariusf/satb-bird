@@ -159,6 +159,7 @@
         PitchDetection.destroy();
       },
       ai: pitchConfig.method === 'auto',
+      movement: movementKind(),
     });
 
     // console.log('game started');
@@ -223,5 +224,9 @@
     let m = document.querySelector('select#pitch-detection-method').value;
     let w = document.querySelector('select#window-size').value;
     return { method: m, windowSize: +w };
+  }
+
+  function movementKind() {
+    return document.querySelector('select#movement-kind').value;
   }
 })();
