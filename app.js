@@ -12,7 +12,6 @@
     })
   );
 
-  // let PitchDetection = Autocorrelation;
   // let PitchDetection = WasmPitch;
 
   function checkScore(score) {
