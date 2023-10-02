@@ -129,6 +129,9 @@
           </clef>
         </attributes>
       <direction placement="above">
+        <sound tempo="230"/>
+      </direction>
+      <direction placement="above">
         <direction-type>
           <words relative-y="10.00" font-family="Times New Roman" font-size="11">Psalm 42</words>
           </direction-type>

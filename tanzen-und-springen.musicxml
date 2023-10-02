@@ -147,6 +147,9 @@
           </clef>
         </attributes>
       <direction placement="above">
+        <sound tempo="250"/>
+      </direction>
+      <direction placement="above">
         <direction-type>
           <words default-y="10.68" relative-y="10.00" font-family="Times New Roman" font-size="19">Tanzen und springen</words>
           </direction-type>

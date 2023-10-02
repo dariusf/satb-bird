@@ -147,6 +147,9 @@
           <line>2</line>
           </clef>
         </attributes>
+      <direction placement="above">
+        <sound tempo="220"/>
+      </direction>
       <note default-x="101.54" default-y="-35.00">
         <pitch>
           <step>F</step>

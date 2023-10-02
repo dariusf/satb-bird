@@ -172,6 +172,9 @@ Edition may be freely distributed, duplicated, performed, or recorded. All other
           <line>2</line>
           </clef>
         </attributes>
+      <direction placement="above">
+        <sound tempo="90"/>
+      </direction>
       <direction placement="below">
         <direction-type>
           <metronome parentheses="no" default-x="-38.52" default-y="-98.26" relative-y="-30.00">

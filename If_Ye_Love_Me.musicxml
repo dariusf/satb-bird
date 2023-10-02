@@ -106,6 +106,9 @@ Editorial text repetitions are shown in italics
           <octave-change>-1</octave-change>
           </transpose>
         </attributes>
+      <direction placement="above">
+        <sound tempo="200"/>
+        </direction>
       <note>
         <pitch>
           <step>C</step>
