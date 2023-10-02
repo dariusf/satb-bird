@@ -3,9 +3,18 @@
   let micStream;
   let audioContext;
 
+  let PitchDetection = {};
+  shaped(
+    PitchDetection,
+    objMap({
+      init: Boolean,
+      method: any,
+    })
+  );
+
   // let PitchDetection = Autocorrelation;
   // let PitchDetection = ML5Pitch;
-  let PitchDetection = WasmPitch;
+  // let PitchDetection = WasmPitch;
 
   function checkScore(score) {
     shaped(score, {
@@ -73,8 +82,6 @@
       Play.init(audioContext);
       // request permission right before we start playing audio
       micStream = await requestMicPermission();
-      await PitchDetection.init(audioContext, onNote, micStream);
-      console.log('pitch detection model loaded');
     } else {
       stopPreviewingParts();
     }
@@ -115,10 +122,14 @@
     let part = score.parts[btn.dataset.part];
     console.log('generating level using', part);
 
-    let noSinging = true;
-    // let noSinging = false;
+    // let noSinging = true;
+    let noSinging = false;
     let testSinging = false;
     // let testSinging = true;
+
+    // TODO do not init more than once if switched, and dispose
+    await PitchDetection.init(audioContext, onNote, micStream);
+    console.log('pitch detection initialized');
 
     if (!noSinging) {
       if (testSinging) {
@@ -181,12 +192,12 @@
     let legend;
     let partsContainer = template(
       '#part-container',
-      'legend',
+      'legend.info',
       (e) => {
         legend = e;
         e.textContent = score.name;
       },
-      '.info',
+      'div.info',
       (e) => {
         let tempoRef = Object.keys(score.parts)[0];
         e.innerHTML = `<div>${score.composer}</div><div>♩=${score.parts[tempoRef].tempo}</div>`;

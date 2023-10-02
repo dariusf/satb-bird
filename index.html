@@ -59,8 +59,14 @@
       fieldset {
         border-radius: 5px;
       }
+
       .responsive-width {
         width: clamp(300px, 80vw, 400px);
+      }
+
+      select {
+        padding: 3px;
+        border-radius: 5px;
       }
     </style>
     <script id="livereload"></script>
@@ -146,7 +152,7 @@
       <div class="responsive-width" style="margin-top: 10px" id="parts-view"></div>
       <template id="part-container">
         <fieldset>
-          <legend></legend>
+          <legend class="info"></legend>
           <div class="info"></div>
         </fieldset>
         <label>
@@ -155,9 +161,45 @@
         </label>
         <br />
         <label style="display: none" class="pro-only">
-          <input id="transpose" type="number" min="-48" max="48" step="1" value="0" />
           Transpose
+          <input id="transpose" type="number" min="-48" max="48" step="1" value="0" />
         </label>
+        <br />
+        <label style="display: none" class="pro-only">
+          Input
+          <select>
+            <option value="autocorrelation">Autocorrelation</option>
+            <option value="macleod">MacLeod</option>
+            <option value="crepe">CREPE></option>
+            <option value="demo">Auto</option>
+          </select>
+        </label>
+        <fieldset style="display: none" class="pro-only">
+          <legend>MacLeod/Autocorrelation</legend>
+          <label
+            >Clarity threshold
+            <input
+              type="range"
+              min="0"
+              max="1"
+              value="0.6"
+              step="0.01"
+              id="claritythreshold"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0.6</output>
+          </label>
+          <br />
+          <label
+            >Window size
+            <select>
+              <option value="512">512</option>
+              <option value="1024">1024</option>
+              <option value="2048">2048</option>
+              <option value="4096">4096</option>
+            </select>
+          </label>
+        </fieldset>
       </template>
 
       <template id="part-player">
@@ -192,7 +234,7 @@
     <!-- <script src="https://unpkg.com/ml5@0.3.1/dist/ml5.min.js"></script> -->
 
     <!-- third-party -->
-    <!-- <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script> -->
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
 
     <script src="shaped.js"></script>
     <script src="util.js"></script>

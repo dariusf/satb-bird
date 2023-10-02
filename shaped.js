@@ -7,7 +7,7 @@
 // Functions are taken to be arbitrary predicates.
 // Singleton arrays denote arbitrary arrays; arrays with two elements may be used to specify a length.
 // Object literals with keys denote objects with specific structure (at least the given keys). The "any object" value is {}.
-// objMap denotes map-like objects with arbitrary keys.
+// objMap denotes map-like objects with arbitrary keys, with values constrained by the given predicate.
 // oneOf is disjunction and may be used for enumerations.
 // any-thing goes, like in TypeScript.
 

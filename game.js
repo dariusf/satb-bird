@@ -5,8 +5,8 @@ let { gameStart, handleInput } = (function () {
   var ON_END = () => {};
   var ON_START = () => {};
 
-  // let AI_ENABLED = false;
-  let AI_ENABLED = true;
+  let AI_ENABLED = false;
+  // let AI_ENABLED = true;
 
   let PART;
   const PIPE_SPEED = 300; // in units per second
