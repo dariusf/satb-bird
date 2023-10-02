@@ -156,6 +156,7 @@
         PitchDetection.stop();
         PitchDetection.destroy();
         OSMD.hide();
+        window.firstPipe = false;
       },
       ai: pitchConfig.method === 'auto',
       movement: movementKind(),
