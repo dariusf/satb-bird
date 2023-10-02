@@ -78,7 +78,7 @@ let MusicXML = (function () {
       name: p.children[0].textContent,
     }));
 
-    window.score = {
+    let score = {
       name: name,
       composer: composer,
       parts: {},

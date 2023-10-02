@@ -78,7 +78,7 @@
     // preview level, rhythm-game style
     Play.parts(score, Object.keys(score.parts), 0, null);
 
-    createScorePartsUI();
+    createScorePartsUI(score);
   }
 
   MusicXML.init(onScoreLoad);
@@ -183,11 +183,19 @@
     Play.parts(score, [btn.dataset.part], 0, null);
   };
 
+  window.transposeChange = function () {
+    stopPreviewingParts();
+    let score = LAST_SCORE;
+    score = transposeScore(score);
+    createScorePartsUI(score);
+    Play.parts(score, Object.keys(score.parts), 0, null);
+  };
+
   window.stopPreviewingParts = function () {
     Play.stop();
   };
 
-  function createScorePartsUI() {
+  function createScorePartsUI(score) {
     let legend;
     let partsContainer = template(
       '#part-container',

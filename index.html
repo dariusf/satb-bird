@@ -159,11 +159,7 @@
       </script>
 
       <div class="responsive-width" style="margin-top: 10px" id="parts-view"></div>
-      <template id="part-container">
-        <fieldset>
-          <legend class="info"></legend>
-          <div class="info"></div>
-        </fieldset>
+      <div class="responsive-width" id="pro-mode-controls">
         <label>
           <input type="checkbox" onchange="toggleProMode(this.checked)" />
           Pro mode
@@ -171,7 +167,15 @@
         <br />
         <label style="display: none" class="pro-only">
           Transpose
-          <input id="transpose" type="number" min="-48" max="48" step="1" value="0" />
+          <input
+            onchange="transposeChange(this.value)"
+            id="transpose"
+            type="number"
+            min="-48"
+            max="48"
+            step="1"
+            value="0"
+          />
         </label>
         <br />
         <label style="display: none" class="pro-only">
@@ -221,6 +225,13 @@
               <option value="4096">4096</option>
             </select>
           </label>
+        </fieldset>
+      </div>
+
+      <template id="part-container">
+        <fieldset>
+          <legend class="info"></legend>
+          <div class="info"></div>
         </fieldset>
       </template>
 
