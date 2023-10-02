@@ -112,36 +112,35 @@
     console.log('generating level using', part);
 
     // let noSinging = true;
-    let noSinging = false;
-    let testSinging = false;
+    // let noSinging = false;
+    // let testSinging = false;
     // let testSinging = true;
 
     // this is just the lifecycle, it's up to each impl to optimize repeated initialization
-    await PitchDetection.init(audioContext, onNote, micStream, pitchDetectionConfig());
+    let pitchConfig = pitchDetectionConfig();
+    await PitchDetection.init(audioContext, onNote, micStream, pitchConfig);
     console.log('pitch detection initialized');
 
-    if (!noSinging) {
-      if (testSinging) {
-        console.log('testing singing; all notes are synthetic!');
-        function f() {
-          onNote({
-            note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
-            cents: Math.floor(Math.random() * 100 - 50),
-          });
-          setTimeout(f, Math.random() * 1000);
-        }
+    if (pitchConfig.method === 'auto') {
+      // do nothing, and do not start pitch detection
+      console.log('auto, no pitch input');
+    } else if (pitchConfig.method === 'random') {
+      console.log('random input; all notes are synthetic!');
+      function f() {
+        onNote({
+          note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
+          cents: Math.floor(Math.random() * 100 - 50),
+        });
         setTimeout(f, Math.random() * 1000);
-      } else {
-        PitchDetection.start();
       }
+      setTimeout(f, Math.random() * 1000);
     } else {
-      console.log('singing disabled');
+      PitchDetection.start();
     }
 
     let app = document.querySelector('#app');
     let canvas = document.querySelector('#flappy');
     let title = document.querySelector('#title-text').parentNode;
-    // console.log('got all stuff');
 
     let bird_delay = gameStart({
       randomPipes: false,
@@ -159,6 +158,7 @@
         PitchDetection.stop();
         PitchDetection.destroy();
       },
+      ai: pitchConfig.method === 'auto',
     });
 
     // console.log('game started');
