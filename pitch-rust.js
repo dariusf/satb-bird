@@ -44,6 +44,7 @@ class PitchNode extends AudioWorkletNode {
 }
 
 let WasmPitch = (function () {
+  let source;
   let enabled = false;
 
   function stop() {
@@ -59,6 +60,7 @@ let WasmPitch = (function () {
     let mediaStream = stream;
 
     const audioSource = audioCtx.createMediaStreamSource(mediaStream);
+    source = audioSource;
 
     let node;
 
@@ -115,5 +117,12 @@ let WasmPitch = (function () {
     return { node };
   }
 
-  return { init, start, stop };
+  function destroy() {
+    if (!source) {
+      return;
+    }
+    source.disconnect();
+  }
+
+  return { init, start, stop, destroy };
 })();

@@ -1,4 +1,4 @@
-import init, { WasmPitchDetector } from './pkg/pitch.js';
+import init, { WasmPitchDetector, Kind } from './pkg/pitch.js';
 
 class PitchProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -32,7 +32,7 @@ class PitchProcessor extends AudioWorkletProcessor {
       // audio samples for our first analysis.
       this.numAudioSamplesPerAnalysis = numAudioSamplesPerAnalysis;
 
-      this.detector = WasmPitchDetector.new(sampleRate, numAudioSamplesPerAnalysis);
+      this.detector = WasmPitchDetector.new(Kind.M, sampleRate, numAudioSamplesPerAnalysis);
 
       // Holds a buffer of audio sample values that we'll send to the Wasm module
       // for analysis at regular intervals.

@@ -168,13 +168,15 @@
         <label style="display: none" class="pro-only">
           Input
           <select>
-            <option value="autocorrelation">Autocorrelation</option>
+            <!-- TODO -->
+            <!-- <option value="yin">YIN</option> -->
             <option value="macleod">MacLeod</option>
+            <option value="autocorrelation">Autocorrelation</option>
             <option value="demo">Auto</option>
           </select>
         </label>
         <fieldset style="display: none" class="pro-only">
-          <legend>MacLeod/Autocorrelation</legend>
+          <legend>Pitch Detection</legend>
           <label
             >Clarity threshold
             <input
@@ -193,7 +195,7 @@
             >Window size
             <select>
               <option value="512">512</option>
-              <option value="1024">1024</option>
+              <option selected value="1024">1024</option>
               <option value="2048">2048</option>
               <option value="4096">4096</option>
             </select>

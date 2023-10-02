@@ -3,16 +3,7 @@
   let micStream;
   let audioContext;
 
-  let PitchDetection = {};
-  shaped(
-    PitchDetection,
-    objMap({
-      init: Boolean,
-      method: any,
-    })
-  );
-
-  // let PitchDetection = WasmPitch;
+  let PitchDetection = WasmPitch;
 
   function checkScore(score) {
     shaped(score, {
@@ -125,7 +116,7 @@
     let testSinging = false;
     // let testSinging = true;
 
-    // TODO do not init more than once if switched, and dispose
+    // this is just the lifecycle, it's up to each impl to optimize repeated initialization
     await PitchDetection.init(audioContext, onNote, micStream);
     console.log('pitch detection initialized');
 
@@ -166,6 +157,7 @@
         title.style.removeProperty('display');
         canvas.style.display = 'none';
         PitchDetection.stop();
+        PitchDetection.destroy();
       },
     });
 

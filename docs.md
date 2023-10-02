@@ -16,7 +16,7 @@ See [this example](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorklet
 
 Setup is from this [tutorial](https://www.toptal.com/webassembly/webassembly-rust-tutorial-web-audio).
 
-- Standard Rust and [wasm-pack](https://rustwasm.github.io/wasm-pack/) are used to build a wasm module which wraps the [pitch-detection](https://github.com/alesgenova/pitch-detection) [crate](https://crates.io/crates/pitch-detection) ([demo](https://github.com/alesgenova/pitch-detection-app)). There is also some shim code which the processor uses to load the wasm blob.
+- Standard Rust and [wasm-pack](https://rustwasm.github.io/wasm-pack/) are used to build a wasm module which wraps the [pitch-detection](https://github.com/alesgenova/pitch-detection) [crate](https://crates.io/crates/pitch-detection) ([demo](https://alesgenova.github.io/pitch-detection-app), [source](https://github.com/alesgenova/pitch-detection-app), [docs](https://docs.rs/pitch-detection/0.3.0/pitch_detection/)). There is also some shim code which the processor uses to load the wasm blob.
 - When the node starts, it fetches the wasm module and sends it(s bytes) to the processor, which compiles and loads it using the shim.
 - The node sends a message requesting pitch detection to start. The processor then instantiates the structures in the wasm module and buffers audio, sending detected pitches back as they arrive, which the node responds to on the main thread. This continues forever.
 

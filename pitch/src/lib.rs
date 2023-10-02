@@ -1,4 +1,6 @@
 use pitch_detection::detector::mcleod::McLeodDetector;
+use pitch_detection::detector::autocorrelation::AutocorrelationDetector;
+use pitch_detection::detector::yin::YINDetector;
 use pitch_detection::detector::PitchDetector;
 use wasm_bindgen::prelude::*;
 
@@ -17,12 +19,17 @@ pub fn set_panic_hook() {
 pub struct WasmPitchDetector {
   sample_rate: usize,
   fft_size: usize,
-  detector: McLeodDetector<f32>,
+  detector: Box<dyn PitchDetector<f32>>,
+}
+
+#[wasm_bindgen]
+pub enum Kind {
+  Y, M, A
 }
 
 #[wasm_bindgen]
 impl WasmPitchDetector {
-  pub fn new(sample_rate: usize, fft_size: usize) -> WasmPitchDetector {
+  pub fn new(which: Kind, sample_rate: usize, fft_size: usize) -> WasmPitchDetector {
     set_panic_hook();
 
     let fft_pad = fft_size / 2;
@@ -30,7 +37,12 @@ impl WasmPitchDetector {
     WasmPitchDetector {
       sample_rate,
       fft_size,
-      detector: McLeodDetector::<f32>::new(fft_size, fft_pad),
+      detector:
+      match which {
+        Kind::Y => Box::new(YINDetector::<f32>::new(fft_size, fft_pad)),
+        Kind::M => Box::new(McLeodDetector::<f32>::new(fft_size, fft_pad)),
+        Kind::A => Box::new(AutocorrelationDetector::<f32>::new(fft_size, fft_pad)),
+      }
     }
   }
 
