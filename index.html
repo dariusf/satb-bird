@@ -167,7 +167,7 @@
         <br />
         <label style="display: none" class="pro-only">
           Input
-          <select>
+          <select id="pitch-detection-method">
             <!-- TODO -->
             <!-- <option value="yin">YIN</option> -->
             <option value="macleod">MacLeod</option>
@@ -177,6 +177,7 @@
         </label>
         <fieldset style="display: none" class="pro-only">
           <legend>Pitch Detection</legend>
+          <!--
           <label
             >Clarity threshold
             <input
@@ -191,9 +192,10 @@
             <output>0.6</output>
           </label>
           <br />
+          -->
           <label
             >Window size
-            <select>
+            <select id="window-size">
               <option value="512">512</option>
               <option selected value="1024">1024</option>
               <option value="2048">2048</option>

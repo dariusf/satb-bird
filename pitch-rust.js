@@ -8,9 +8,9 @@ class PitchNode extends AudioWorkletNode {
    * @param {number} numAudioSamplesPerAnalysis Number of audio samples used
    * for each analysis. Must be a power of 2.
    */
-  init(wasmBytes, onPitchDetectedCallback, numAudioSamplesPerAnalysis) {
+  init(wasmBytes, onPitchDetectedCallback, params) {
     this.onPitchDetectedCallback = onPitchDetectedCallback;
-    this.numAudioSamplesPerAnalysis = numAudioSamplesPerAnalysis;
+    this.params = params;
 
     // Listen to messages sent from the audio processor.
     this.port.onmessage = (event) => this.onmessage(event.data);
@@ -34,7 +34,7 @@ class PitchNode extends AudioWorkletNode {
       this.port.postMessage({
         type: 'init-detector',
         sampleRate: this.context.sampleRate,
-        numAudioSamplesPerAnalysis: this.numAudioSamplesPerAnalysis,
+        params: this.params,
       });
     } else if (event.type === 'pitch') {
       // A pitch was detected. Invoke our callback which will result in the UI updating.
@@ -55,7 +55,7 @@ let WasmPitch = (function () {
     enabled = true;
   }
 
-  async function init(audioCtx, onPitchDetected, stream) {
+  async function init(audioCtx, onPitchDetected, stream, params) {
     onPitch = onPitchDetected;
     let mediaStream = stream;
 
@@ -88,7 +88,7 @@ let WasmPitch = (function () {
       // can lead to notes being missed in faster passages i.e. where the music note is
       // changing rapidly. 1024 is usually a good balance between efficiency and accuracy
       // for music analysis.
-      const numAudioSamplesPerAnalysis = 1024;
+      // const numAudioSamplesPerAnalysis = 1024;
 
       // Send the Wasm module to the audio node which in turn passes it to the
       // processor running in the Worklet thread. Also, pass any configuration
@@ -100,7 +100,7 @@ let WasmPitch = (function () {
             onPitchDetected(interpretFreq(freq));
           }
         },
-        numAudioSamplesPerAnalysis
+        params
       );
 
       // Connect the audio source (microphone output) to our analysis node.

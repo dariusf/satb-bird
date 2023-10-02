@@ -1,7 +1,7 @@
 import init, { WasmPitchDetector, Kind } from './pkg/pitch.js';
 
 class PitchProcessor extends AudioWorkletProcessor {
-  constructor() {
+  constructor(options) {
     super();
 
     // Initialized to an array holding a buffer of samples for analysis later -
@@ -26,17 +26,32 @@ class PitchProcessor extends AudioWorkletProcessor {
         this.port.postMessage({ type: 'wasm-module-loaded' });
       });
     } else if (event.type === 'init-detector') {
-      const { sampleRate, numAudioSamplesPerAnalysis } = event;
+      const { sampleRate, params } = event;
 
       // Store this because we use it later to detect when we have enough recorded
       // audio samples for our first analysis.
-      this.numAudioSamplesPerAnalysis = numAudioSamplesPerAnalysis;
+      this.numAudioSamplesPerAnalysis = params.windowSize;
 
-      this.detector = WasmPitchDetector.new(Kind.M, sampleRate, numAudioSamplesPerAnalysis);
+      let method;
+      switch (params.method) {
+        case 'yin':
+          method = Kind.Y;
+          break;
+        case 'autocorrelation':
+          method = Kind.A;
+          break;
+        case 'macleod':
+          method = Kind.M;
+          break;
+        default:
+          throw 'failed';
+      }
+
+      this.detector = WasmPitchDetector.new(method, sampleRate, params.windowSize);
 
       // Holds a buffer of audio sample values that we'll send to the Wasm module
       // for analysis at regular intervals.
-      this.samples = new Array(numAudioSamplesPerAnalysis).fill(0);
+      this.samples = new Array(params.windowSize).fill(0);
       this.totalSamples = 0;
     }
   }

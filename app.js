@@ -117,7 +117,7 @@
     // let testSinging = true;
 
     // this is just the lifecycle, it's up to each impl to optimize repeated initialization
-    await PitchDetection.init(audioContext, onNote, micStream);
+    await PitchDetection.init(audioContext, onNote, micStream, pitchDetectionConfig());
     console.log('pitch detection initialized');
 
     if (!noSinging) {
@@ -218,4 +218,10 @@
       document.querySelectorAll('.pro-only').forEach((e) => (e.style.display = 'none'));
     }
   };
+
+  function pitchDetectionConfig() {
+    let m = document.querySelector('select#pitch-detection-method').value;
+    let w = document.querySelector('select#window-size').value;
+    return { method: m, windowSize: +w };
+  }
 })();
