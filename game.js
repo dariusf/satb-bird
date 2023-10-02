@@ -535,6 +535,16 @@ let { gameStart, handleInput } = (function () {
           this.birds[i].width,
           this.birds[i].height
         );
+
+        if (flappyNote) {
+          this.ctx.save();
+          this.ctx.fillStyle = '#000';
+          this.ctx.font = '30px ui-rounded, sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(flappyNote.note, 100, 0);
+          this.ctx.restore();
+        }
+
         this.ctx.restore();
       }
     }
