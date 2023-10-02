@@ -13,7 +13,6 @@
   );
 
   // let PitchDetection = Autocorrelation;
-  // let PitchDetection = ML5Pitch;
   // let PitchDetection = WasmPitch;
 
   function checkScore(score) {
