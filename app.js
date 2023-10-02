@@ -242,6 +242,10 @@
     return { method: m, windowSize: +w };
   }
 
+  window.chosenSynth = function () {
+    return document.querySelector('select#synth').value;
+  };
+
   function movementKind() {
     return document.querySelector('select#movement-kind').value;
   }

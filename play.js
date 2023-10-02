@@ -9,10 +9,7 @@ let Play = (function () {
   function playNote(freq, time, dur, vol) {
     oscillator = audioCtx.createOscillator();
     gain = audioCtx.createGain();
-    // oscillator.type = 'sine';
-    // oscillator.type = 'sawtooth';
-    // oscillator.type = 'square';
-    oscillator.type = 'triangle';
+    oscillator.type = chosenSynth();
     oscillator.connect(gain);
     oscillator.frequency.value = freq;
 

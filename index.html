@@ -166,16 +166,18 @@
         </label>
         <br />
         <label style="display: none" class="pro-only">
+          Synth
+          <select onchange="transposeChange()" id="synth">
+            <option value="triangle">Triangle</option>
+            <option value="sine">Sine</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="square">Square</option>
+          </select>
+        </label>
+        <br />
+        <label style="display: none" class="pro-only">
           Transpose
-          <input
-            onchange="transposeChange(this.value)"
-            id="transpose"
-            type="number"
-            min="-48"
-            max="48"
-            step="1"
-            value="0"
-          />
+          <input onchange="transposeChange()" id="transpose" type="number" min="-48" max="48" step="1" value="0" />
         </label>
         <br />
         <label style="display: none" class="pro-only">
