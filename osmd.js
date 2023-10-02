@@ -47,8 +47,10 @@ let OSMD = (function () {
   function next() {
     osmd.cursor.next();
     // skip rests. this hides the rest of the score until it's time for the note, though. unfortunately we don't have anything to use to tell when rests occur, as we don't play rests or spawn pipes for them, so this is the best we can do for now
-    while (osmd.cursor.NotesUnderCursor()[0].pitch === undefined) {
+    let notes = osmd.cursor.NotesUnderCursor();
+    while (notes.length > 0 && notes[0].pitch === undefined) {
       osmd.cursor.next();
+      notes = osmd.cursor.NotesUnderCursor();
     }
     scroll();
   }
