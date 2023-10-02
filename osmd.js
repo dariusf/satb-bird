@@ -32,6 +32,7 @@ let OSMD = (function () {
     osmd.render();
     osmd.cursor.show();
     osmd.cursor.reset();
+    skipRests();
     scroll();
   }
 
@@ -46,17 +47,22 @@ let OSMD = (function () {
 
   function next() {
     osmd.cursor.next();
+    skipRests();
+    scroll();
+  }
+
+  function skipRests() {
     // skip rests. this hides the rest of the score until it's time for the note, though. unfortunately we don't have anything to use to tell when rests occur, as we don't play rests or spawn pipes for them, so this is the best we can do for now
     let notes = osmd.cursor.NotesUnderCursor();
-    // skip if rest, or not the first note of a tie
+    // skip if nothing/rest, or not the first note of a tie
     while (
-      notes.length > 0 &&
-      (notes[0].pitch === undefined || (notes[0].tie != undefined && notes[0].tie.notes[0] !== notes[0]))
+      notes.length === 0 ||
+      (notes.length > 0 &&
+        (notes[0].pitch === undefined || (notes[0].tie != undefined && notes[0].tie.notes[0] !== notes[0])))
     ) {
       osmd.cursor.next();
       notes = osmd.cursor.NotesUnderCursor();
     }
-    scroll();
   }
 
   function scroll() {

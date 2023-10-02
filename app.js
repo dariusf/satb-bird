@@ -120,7 +120,7 @@
       // do nothing, and do not start pitch detection
       console.log('auto, no pitch input');
     } else if (pitchConfig.method === 'random') {
-      console.log('random input; all notes are synthetic!');
+      console.log('random input; synthetic pitch input!');
       function f() {
         onNote({
           note: part.range.notes[Math.floor(Math.random() * part.range.notes.length)],
