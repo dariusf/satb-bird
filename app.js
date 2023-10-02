@@ -5,34 +5,35 @@
 
   let PitchDetection = WasmPitch;
 
+  let scoreShape = {
+    name: String,
+    composer: String,
+    parts: objMap({
+      divisions: Number,
+      tempo: Number,
+      time: [Number],
+      notes: [
+        oneOf(
+          { duration: Number, rest: Boolean },
+          { duration: Number, pitch: { note: String, octave: Number }, lyrics: String }
+        ),
+        ,
+      ],
+      range: {
+        top: isNote,
+        bottom: isNote,
+        octaves: Number,
+        // semitones: Number,
+        notes: [isNote],
+      },
+    }),
+  };
+
   function checkScore(score) {
-    shaped(score, {
-      name: String,
-      composer: String,
-      parts: objMap({
-        divisions: Number,
-        tempo: Number,
-        time: [Number],
-        notes: [
-          oneOf(
-            { duration: Number, rest: Boolean },
-            { duration: Number, pitch: { note: String, octave: Number }, lyrics: String }
-          ),
-          ,
-        ],
-        range: {
-          top: isNote,
-          bottom: isNote,
-          octaves: Number,
-          // semitones: Number,
-          notes: [isNote],
-        },
-      }),
-    });
+    shaped(score, scoreShape);
   }
 
-  function transposeScore(score) {
-    checkScore(score);
+  let transposeScore = define([scoreShape], scoreShape, (score) => {
     let { value } = document.querySelector('#transpose');
     let by = +value;
     let res = {
@@ -55,9 +56,8 @@
         },
       })),
     };
-    checkScore(res);
     return res;
-  }
+  });
 
   async function onScoreLoad(score) {
     console.log('musicxml loaded', score);
