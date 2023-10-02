@@ -72,6 +72,10 @@ class PitchProcessor extends AudioWorkletProcessor {
     // inputSamples holds an array of new samples to process.
     const inputSamples = inputChannels[0];
 
+    if (!inputSamples) {
+      return false; // audio has stopped
+    }
+
     // In the AudioWorklet spec, process() is called whenever exactly 128 new
     // audio samples have arrived. We simplify the logic for filling up the
     // buffer by making an assumption that the analysis size is 128 samples or
