@@ -83,15 +83,18 @@
 
   MusicXML.init(onScoreLoad);
 
-  window.loadScoreFile = function (e) {
-    MusicXML.readFile(e.files[0]);
+  window.loadScoreFile = async function (e) {
+    // TODO race, it's possible to start the game while the score is rendering but after it is loaded
+    let xml = await MusicXML.readFile(e.files[0]);
+    await OSMD.load(xml);
   };
 
-  window.loadExample = function (s) {
+  window.loadExample = async function (s) {
     if (!s.value) {
       return;
     }
-    MusicXML.loadScoreURL(s.value);
+    let xml = await MusicXML.loadScoreURL(s.value);
+    await OSMD.load(xml);
   };
 
   function onNote(nc) {
@@ -111,15 +114,7 @@
     let part = score.parts[btn.dataset.part];
     console.log('generating level using', part);
 
-    // let noSinging = true;
-    // let noSinging = false;
-    // let testSinging = false;
-    // let testSinging = true;
-
-    // this is just the lifecycle, it's up to each impl to optimize repeated initialization
     let pitchConfig = pitchDetectionConfig();
-    await PitchDetection.init(audioContext, onNote, micStream, pitchConfig);
-    console.log('pitch detection initialized');
 
     if (pitchConfig.method === 'auto') {
       // do nothing, and do not start pitch detection
@@ -135,6 +130,9 @@
       }
       setTimeout(f, Math.random() * 1000);
     } else {
+      // this is just the lifecycle, it's up to each impl to optimize repeated initialization
+      await PitchDetection.init(audioContext, onNote, micStream, pitchConfig);
+      console.log('pitch detection initialized');
       PitchDetection.start();
     }
 
@@ -157,21 +155,24 @@
         canvas.style.display = 'none';
         PitchDetection.stop();
         PitchDetection.destroy();
+        OSMD.hide();
       },
       ai: pitchConfig.method === 'auto',
       movement: movementKind(),
       onPipeEncountered: () => {
         if (!window.firstPipe) {
+          // skip the first note
           window.firstPipe = true;
           return;
         }
-        cursorNext();
+        OSMD.next();
       },
     });
 
-    // console.log('game started');
     Play.parts(score, Object.keys(score.parts), bird_delay, btn.dataset.part);
-    // console.log('parts playing');
+
+    OSMD.show();
+    OSMD.startPart(btn.dataset.part); // scroll only after visible
   };
 
   window.previewOnePart = function (btn) {

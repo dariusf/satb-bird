@@ -102,7 +102,15 @@
         </script>
       </div>
     </div>
+
     <canvas id="flappy" style="display: none"></canvas>
+
+    <!-- bottom padding for scrollbar, top just to add a bit of space -->
+    <div
+      style="display: none; overflow-x: scroll; width: 80%; margin: auto; padding: 20px 0px"
+      id="osmdContainer"
+    ></div>
+
     <!-- controls -->
     <div class="container" id="app">
       <div class="responsive-width">
@@ -236,43 +244,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js"></script>
 
-    <!-- bottom padding for scrollbar -->
-    <div style="overflow-x: scroll; width: 80%; margin: auto; padding-bottom: 20px" id="osmdContainer" />
-    <script>
-      var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay('osmdContainer');
-      osmd.setOptions({
-        backend: 'svg',
-        drawTitle: false,
-        drawingParameters: 'compacttight', // don't display title, composer etc., smaller margins
-        renderSingleHorizontalStaffline: true,
-      });
-      osmd.load('Joy_to_the_World.musicxml').then(function () {
-        osmd.sheet.Instruments[1].Visible = false;
-        osmd.sheet.Instruments[2].Visible = false;
-        osmd.sheet.Instruments[3].Visible = false;
-        osmd.render();
-        osmd.cursor.show();
-        // function it(n) {
-        //   if (n > 10) {
-        //     return;
-        //   }
-        //   cursorNext()
-        //   setTimeout(() => it(n + 1), 1000);
-        // }
-        // it(0);
-      });
-
-      function cursorNext() {
-        osmd.cursor.next();
-        osmd.cursor.cursorElement.scrollIntoView({
-          // behavior: 'smooth',
-          behavior: 'auto',
-          block: 'center',
-          inline: 'center',
-        });
-      }
-    </script>
-
     <script src="shaped.js"></script>
     <script src="util.js"></script>
 
@@ -286,6 +257,7 @@
     <script src="game.js"></script>
     <script src="musicxml.js"></script>
     <script src="play.js"></script>
+    <script src="osmd.js"></script>
 
     <!-- entry -->
     <script src="app.js"></script>

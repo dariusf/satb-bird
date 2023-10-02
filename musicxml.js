@@ -21,15 +21,19 @@ let MusicXML = (function () {
     const response = await fetch(url);
     const str = await response.text();
     onMusicXMLLoad(url.split('/').pop(), onScoreLoaded, str);
-    // TODO error-handling
+    return str;
   }
 
   function readFile(file) {
     var reader = new FileReader();
-    reader.onload = () => {
-      onMusicXMLLoad(file.name, onScoreLoaded, reader.result);
-    };
-    reader.readAsText(file);
+    return new Promise((resolve, _reject) => {
+      reader.onload = () => {
+        let res = reader.result;
+        onMusicXMLLoad(file.name, onScoreLoaded, res);
+        resolve(res);
+      };
+      reader.readAsText(file);
+    });
   }
 
   function onMusicXMLLoad(name, resolve, data) {
@@ -38,8 +42,10 @@ let MusicXML = (function () {
       data = parser.parseFromString(data, 'application/xml');
     } else if (data instanceof XMLDocument) {
       console.log('xml document loaded');
+      throw 'xml';
     } else {
       console.log('not a valid format:', (data && data.constructor) || data);
+      throw 'invalid format';
     }
 
     try {
