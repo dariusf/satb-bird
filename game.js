@@ -551,6 +551,18 @@ let { gameStart, handleInput } = (function () {
       if (this.birds[i].alive) {
         this.ctx.save();
         this.ctx.translate(this.birds[i].x + this.birds[i].width / 2, this.birds[i].y + this.birds[i].height / 2);
+
+        // draw note, while we're at bird position
+        if (flappyNote) {
+          this.ctx.save();
+          this.ctx.fillStyle = '#000';
+          this.ctx.font = '25px ui-rounded, sans-serif';
+          this.ctx.textAlign = 'center';
+          // this.ctx.fillText(flappyNote.note, this.birds[i].x + 100, this.birds[i].y);
+          this.ctx.fillText(flappyNote.note, 50, 0);
+          this.ctx.restore();
+        }
+
         this.ctx.rotate(((Math.PI / 2) * this.birds[i].dir * this.birds[i].velocity) / 20);
         this.ctx.drawImage(
           images.bird,
@@ -559,16 +571,6 @@ let { gameStart, handleInput } = (function () {
           this.birds[i].width,
           this.birds[i].height
         );
-
-        if (flappyNote) {
-          this.ctx.save();
-          this.ctx.fillStyle = '#000';
-          this.ctx.font = '30px ui-rounded, sans-serif';
-          this.ctx.textAlign = 'center';
-          this.ctx.fillText(flappyNote.note, 100, 0);
-          this.ctx.restore();
-        }
-
         this.ctx.restore();
       }
     }
