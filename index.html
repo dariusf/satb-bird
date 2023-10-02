@@ -236,7 +236,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js"></script>
 
-    <div style="overflow-x: scroll; width: 80%; margin: auto" id="osmdContainer" />
+    <!-- bottom padding for scrollbar -->
+    <div style="overflow-x: scroll; width: 80%; margin: auto; padding-bottom: 20px" id="osmdContainer" />
     <script>
       var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay('osmdContainer');
       osmd.setOptions({
@@ -245,12 +246,31 @@
         drawingParameters: 'compacttight', // don't display title, composer etc., smaller margins
         renderSingleHorizontalStaffline: true,
       });
-      osmd.load('ave-verum-corpus.musicxml').then(function () {
+      osmd.load('Joy_to_the_World.musicxml').then(function () {
         osmd.sheet.Instruments[1].Visible = false;
         osmd.sheet.Instruments[2].Visible = false;
         osmd.sheet.Instruments[3].Visible = false;
         osmd.render();
+        osmd.cursor.show();
+        // function it(n) {
+        //   if (n > 10) {
+        //     return;
+        //   }
+        //   cursorNext()
+        //   setTimeout(() => it(n + 1), 1000);
+        // }
+        // it(0);
       });
+
+      function cursorNext() {
+        osmd.cursor.next();
+        osmd.cursor.cursorElement.scrollIntoView({
+          // behavior: 'smooth',
+          behavior: 'auto',
+          block: 'center',
+          inline: 'center',
+        });
+      }
     </script>
 
     <script src="shaped.js"></script>

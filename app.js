@@ -160,6 +160,13 @@
       },
       ai: pitchConfig.method === 'auto',
       movement: movementKind(),
+      onPipeEncountered: () => {
+        if (!window.firstPipe) {
+          window.firstPipe = true;
+          return;
+        }
+        cursorNext();
+      },
     });
 
     // console.log('game started');

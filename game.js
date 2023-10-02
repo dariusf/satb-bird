@@ -4,6 +4,8 @@ let { gameStart, handleInput } = (function () {
   var DEFAULT_RANDOM_PIPES = false;
   var ON_END = () => {};
   var ON_START = () => {};
+  var ON_PIPE_PASSED = () => {};
+  var ON_PIPE_ENCOUNTERED = () => {};
 
   let AI_ENABLED;
   let MOVEMENT_KIND;
@@ -69,21 +71,25 @@ let { gameStart, handleInput } = (function () {
       function closestPoint(p) {
         return p.top.x - p.top.width / 2;
       }
-      let pipe = game.pipes.reduce(
+      let nextPipe = game.pipes.reduce(
         (t, c) => {
           let { dist } = t;
           let p = closestPoint(c);
           let d = p - this.x;
-          let upcoming = this.x <= p;
-          let nearest = d <= dist;
+          let isUpcoming = this.x <= p;
+          let isNearest = d <= dist;
           // don't react to pipes which are too close
-          let near = 10 <= d && d <= 40;
-          return near && upcoming && nearest ? { dist: d, pipe: c } : t;
+          let isNear = 10 <= d && d <= 40;
+          if (isNear && isUpcoming && isNearest) {
+            return { dist: d, pipe: c };
+          } else {
+            return t;
+          }
         },
         { pipe: null, dist: Infinity }
       ).pipe;
-      if (pipe) {
-        flappyNote = { note: noteToImplicit(pipe.note.pitch), cents: 0 };
+      if (nextPipe) {
+        flappyNote = { note: noteToImplicit(nextPipe.note.pitch), cents: 0 };
       }
     }
 
@@ -369,12 +375,12 @@ let { gameStart, handleInput } = (function () {
     this.backgroundx += BACKGROUND_SPEED * dt;
 
     // flap (or sing)
-    for (var pipe in this.birds) {
-      if (this.birds[pipe].alive) {
-        this.birds[pipe].sing(dt);
+    for (let b in this.birds) {
+      if (this.birds[b].alive) {
+        this.birds[b].sing(dt);
         // this.birds[pipe].update(dt);
-        if (this.birds[pipe].isDead(this.height, this.pipes)) {
-          this.birds[pipe].alive = false;
+        if (this.birds[b].isDead(this.height, this.pipes)) {
+          this.birds[b].alive = false;
           this.alives--;
           if (this.isItEnd()) {
             this.start();
@@ -384,12 +390,30 @@ let { gameStart, handleInput } = (function () {
     }
 
     // move and remove pipes
-    for (var pipe = 0; pipe < this.pipes.length; pipe++) {
-      this.pipes[pipe].top.update(dt);
-      this.pipes[pipe].bot.update(dt);
-      if (this.pipes[pipe].top.isOut()) {
-        this.pipes.splice(pipe, 1);
-        pipe--;
+    for (let p = 0; p < this.pipes.length; p++) {
+      let rightBefore = this.pipes[p].top.x + this.pipes[p].top.width;
+      let leftBefore = this.pipes[p].top.x;
+      // let centerBefore = this.pipes[p].top.x + this.pipes[p].top.width / 2;
+      this.pipes[p].top.update(dt);
+      this.pipes[p].bot.update(dt);
+      let rightAfter = this.pipes[p].top.x + this.pipes[p].top.width;
+      let leftAfter = this.pipes[p].top.x;
+      // let centerAfter = this.pipes[p].top.x + this.pipes[p].top.width / 2;
+
+      for (let b in this.birds) {
+        let bird_right = this.birds[b].x + this.birds[b].width / 2;
+        let bird_left = this.birds[b].x - this.birds[b].width / 2;
+        if (rightAfter <= bird_right && bird_right <= rightBefore) {
+          ON_PIPE_PASSED();
+        }
+        if (leftAfter <= bird_left && bird_left <= leftBefore) {
+          ON_PIPE_ENCOUNTERED();
+        }
+      }
+
+      if (this.pipes[p].top.isOut()) {
+        this.pipes.splice(p, 1);
+        p--;
       }
     }
 
@@ -575,12 +599,14 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  function gameStart({ randomPipes, part, onEnd, onStart, ai, movement }) {
+  function gameStart({ randomPipes, part, onEnd, onStart, ai, movement, onPipePassed, onPipeEncountered }) {
     AI_ENABLED = ai;
     MOVEMENT_KIND = movement;
     DEFAULT_RANDOM_PIPES = randomPipes;
     ON_END = onEnd;
     ON_START = onStart;
+    ON_PIPE_PASSED = onPipePassed || ON_PIPE_PASSED;
+    ON_PIPE_ENCOUNTERED = onPipeEncountered || ON_PIPE_ENCOUNTERED;
     PART = part;
     game = new Game();
     game.start();
