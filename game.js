@@ -1,4 +1,4 @@
-let { gameStart, handleInput } = (function () {
+let { gameStart, handleInput, gameStop } = (function () {
   var NO_PIPES = false;
   var INVULNERABLE = true;
   var DEFAULT_RANDOM_PIPES = false;
@@ -605,6 +605,9 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
+  function gameStop() {
+    game.stop();
+  }
   function gameStart({
     randomPipes,
     part,
@@ -651,5 +654,5 @@ let { gameStart, handleInput } = (function () {
     }
   }
 
-  return { gameStart, handleInput };
+  return { gameStart, handleInput, gameStop };
 })();

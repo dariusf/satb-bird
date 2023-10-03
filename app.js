@@ -139,6 +139,7 @@
     let app = document.querySelector('#app');
     let canvas = document.querySelector('#flappy');
     let title = document.querySelector('#title-text').parentNode;
+    let stopBtn = document.querySelector('button#stop-game');
 
     let bird_delay = gameStart({
       randomPipes: false,
@@ -148,8 +149,11 @@
         title.style.display = 'none';
         // this also has the side effect that scroll bars are hidden
         canvas.style.display = 'block';
+        stopBtn.style.removeProperty('display');
       },
       onEnd() {
+        stopBtn.style.display = 'none';
+        Play.stop(); // in case the game didn't end normally
         app.style.removeProperty('display');
         title.style.removeProperty('display');
         canvas.style.display = 'none';
