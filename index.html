@@ -159,55 +159,69 @@
       </script>
 
       <div class="responsive-width" style="margin-top: 10px" id="parts-view"></div>
-      <div class="responsive-width" id="pro-mode-controls">
+      <div class="responsive-width" style="margin-bottom: 1em">
         <label>
           <input type="checkbox" onchange="toggleProMode(this.checked)" />
           Pro mode
         </label>
-        <br />
-        <label>
-          <input type="checkbox" id="note-being-sung" />
-          Show note being sung
-        </label>
-        <br />
-        <label style="display: none" class="pro-only">
-          Synth
-          <select onchange="transposeChange()" id="synth">
-            <option value="triangle">Triangle</option>
-            <option value="sine">Sine</option>
-            <option value="sawtooth">Sawtooth</option>
-            <option value="square">Square</option>
-          </select>
-        </label>
-        <br />
-        <label style="display: none" class="pro-only">
-          Transpose
-          <input onchange="transposeChange()" id="transpose" type="number" min="-48" max="48" step="1" value="0" />
-        </label>
-        <br />
-        <label style="display: none" class="pro-only">
-          Input
-          <select id="pitch-detection-method">
-            <option value="macleod">MacLeod</option>
-            <option value="yin">YIN</option>
-            <option value="autocorrelation">Autocorrelation</option>
-            <option value="auto">Auto</option>
-            <option value="random">Random</option>
-          </select>
-        </label>
-        <fieldset style="display: none" class="pro-only">
-          <legend>Gameplay</legend>
-          <label
-            >Movement
-            <select id="movement-kind">
-              <option value="precise">Precise</option>
-              <option value="wobbly">Wobbly</option>
+      </div>
+      <div
+        class="responsive-width"
+        style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px"
+        id="pro-mode-controls"
+      >
+        <div>
+          <label style="display: none" class="pro-only">
+            <input type="checkbox" id="note-being-sung" />
+            Show note being sung
+          </label>
+        </div>
+        <div>
+          <label style="display: none" class="pro-only">
+            Synth
+            <select onchange="transposeChange()" id="synth">
+              <option value="triangle">Triangle</option>
+              <option value="sine">Sine</option>
+              <option value="sawtooth">Sawtooth</option>
+              <option value="square">Square</option>
             </select>
           </label>
-        </fieldset>
-        <fieldset style="display: none" class="pro-only">
-          <legend>Pitch Detection</legend>
-          <!--
+        </div>
+        <div>
+          <label style="display: none" class="pro-only">
+            Transpose
+            <input onchange="transposeChange()" id="transpose" type="number" min="-48" max="48" step="1" value="0" />
+          </label>
+        </div>
+        <div>
+          <label style="display: none" class="pro-only">
+            Input
+            <select id="pitch-detection-method">
+              <option value="macleod">MacLeod</option>
+              <option value="yin">YIN</option>
+              <option value="autocorrelation">Autocorrelation</option>
+              <option value="auto">Auto</option>
+              <option value="random">Random</option>
+            </select>
+          </label>
+        </div>
+        <div style="display: flex">
+          <div style="display: none" class="pro-only">
+            <fieldset style="display: inline">
+              <legend>Gameplay</legend>
+              <label
+                >Movement
+                <select id="movement-kind">
+                  <option value="precise">Precise</option>
+                  <option value="wobbly">Wobbly</option>
+                </select>
+              </label>
+            </fieldset>
+          </div>
+          <div style="display: none" class="pro-only">
+            <fieldset style="display: inline">
+              <legend>Pitch Detection</legend>
+              <!--
           <label
             >Clarity threshold
             <input
@@ -223,16 +237,18 @@
           </label>
           <br />
           -->
-          <label
-            >Window size
-            <select id="window-size">
-              <option value="512">512</option>
-              <option selected value="1024">1024</option>
-              <option value="2048">2048</option>
-              <option value="4096">4096</option>
-            </select>
-          </label>
-        </fieldset>
+              <label
+                >Window size
+                <select id="window-size">
+                  <option value="512">512</option>
+                  <option selected value="1024">1024</option>
+                  <option value="2048">2048</option>
+                  <option value="4096">4096</option>
+                </select>
+              </label>
+            </fieldset>
+          </div>
+        </div>
       </div>
 
       <template id="part-container">
