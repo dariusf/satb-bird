@@ -5,18 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
     <style>
-      #title-text {
-        font-size: 35px;
-      }
-
       * {
         /* https://github.com/system-fonts/modern-font-stacks */
         font-family: ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT',
           'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif;
-      }
-
-      #title-text path {
-        fill: transparent;
       }
 
       .container {
@@ -89,15 +81,20 @@
     <!-- title -->
     <div class="container">
       <div id="heading" style="height: 100px; width: min(400px, 100vw)">
-        <svg id="title-text" viewBox="0 0 500 100">
-          <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
+        <svg style="font-size: 35px" viewBox="0 0 500 100">
+          <path
+            style="fill: transparent"
+            id="curve"
+            d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97"
+          />
           <text font-size="1.3em">
             <textPath startOffset="21%" xlink:href="#curve">SATB Bird</textPath>
           </text>
         </svg>
         <script>
           if (!navigator.userAgent.includes('Chrome')) {
-            document.querySelector('#heading').parentNode.innerHTML = '<p style="font-size: 2em">SATB Bird</p>';
+            document.querySelector('#heading').parentNode.innerHTML =
+              '<p id="heading" style="font-size: 2em">SATB Bird</p>';
           }
         </script>
       </div>
