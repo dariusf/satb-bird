@@ -4,9 +4,19 @@ let OSMD = (function () {
 
   osmd.setOptions({
     backend: 'svg',
-    // drawTitle: false,
+    // our custom scrolling behavior seems to work better
+    // followCursor: true,
     drawingParameters: 'compacttight',
     renderSingleHorizontalStaffline: true,
+    // hide and follow cursor
+    // cursorsOptions: [{ color: 'white', alpha: 0, follow: true }],
+    cursorsOptions: [
+      {
+        alpha: 0.5,
+        color: 'rgb(167,223,140)',
+        // 'rgb(145,193,205)',
+      },
+    ],
   });
 
   async function load(xml) {
