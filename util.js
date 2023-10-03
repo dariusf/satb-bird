@@ -175,3 +175,7 @@ function mapOverObject(object, f) {
     return result;
   }, {});
 }
+
+function isMobile() {
+  return window.matchMedia('screen and (max-width: 768px)').matches;
+}

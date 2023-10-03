@@ -1,4 +1,5 @@
 let OSMD = (function () {
+  // https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/blob/master/src/OpenSheetMusicDisplay/OSMDOptions.ts
   const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay('osmdContainer');
   window.osmd = osmd;
 
@@ -35,6 +36,10 @@ let OSMD = (function () {
       osmd.sheet.Instruments[p].Visible = true;
     } else {
       throw 'unknown part';
+    }
+
+    if (isMobile()) {
+      osmd.zoom = 0.5;
     }
 
     // we have to rerender after changing visibility.
