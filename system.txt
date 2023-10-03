@@ -1,0 +1,23 @@
+SATB Bird
+  Welcome
+    Choose level -> Choosing level
+  Choosing level
+    Upload MusicXML -> Choosing part
+    Pick example -> Main screen
+    Randomly generated -> Main screen
+  Choosing part
+    Pick part -> Main screen
+  Main screen
+    Calibrate -> Calibrating
+    Start -> Mic permission
+  Mic permission
+    Allow -> Playing
+    Deny -> Main screen
+  Playing
+    Sing -> Playing
+    Game end -> Main screen
+
+Calibrating
+  Try to sing this note
+    Ok -> Try to sing this note
+    Done -> Main screen

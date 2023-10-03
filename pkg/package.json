@@ -1,0 +1,17 @@
+{
+  "name": "pitch",
+  "collaborators": [
+    "Darius Foo <darius.foo.tw@gmail.com"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "pitch_bg.wasm",
+    "pitch.js",
+    "pitch.d.ts"
+  ],
+  "module": "pitch.js",
+  "types": "pitch.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

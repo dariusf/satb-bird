@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>♫ SATB Bird</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+    <style>
+      * {
+        /* https://github.com/system-fonts/modern-font-stacks */
+        font-family: ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT',
+          'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif;
+      }
+
+      .container {
+        display: grid;
+        justify-content: center;
+      }
+
+      .tab-bar button.active {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-top: solid #ccc 1px;
+        border-right: solid #ccc 1px;
+        border-left: solid #ccc 1px;
+        border-bottom: solid #fff 1px;
+        margin-bottom: -1px;
+      }
+
+      button {
+        background-color: inherit;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        font-size: 1em;
+      }
+
+      button:hover {
+        text-decoration: underline;
+      }
+
+      .tabcontent {
+        display: none;
+        height: 50px;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+
+      fieldset {
+        border-radius: 5px;
+      }
+
+      .responsive-width {
+        width: clamp(300px, 80vw, 400px);
+      }
+
+      select {
+        padding: 3px;
+        border-radius: 5px;
+      }
+
+      #osmdContainer {
+        padding: 20px 0px;
+      }
+
+      /* https://github.com/amirshnll/custom-device-emulation-chrome */
+      @media only screen and (max-width: 480px) {
+        #osmdContainer {
+          padding: 5px 0px;
+        }
+      }
+    </style>
+    <script id="livereload"></script>
+    <script>
+      let DEV = window.location.hostname === 'localhost';
+      if (DEV) {
+        // document.write(
+        //   '<script src="http://' +
+        //     (location.host || 'localhost').split(':')[0] +
+        //     ':35729/livereload.js?snipver=1"></' +
+        //     'script>'
+        // );
+        document.querySelector('#livereload').src =
+          'http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1';
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- title -->
+    <div class="container">
+      <div id="heading" style="height: 100px; width: min(400px, 100vw)">
+        <svg style="font-size: 35px" viewBox="0 0 500 100">
+          <path
+            style="fill: transparent"
+            id="curve"
+            d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97"
+          />
+          <text font-size="1.3em">
+            <textPath startOffset="21%" xlink:href="#curve">SATB Bird</textPath>
+          </text>
+        </svg>
+        <script>
+          if (!navigator.userAgent.includes('Chrome')) {
+            document.querySelector('#heading').parentNode.innerHTML =
+              '<p id="heading" style="font-size: 2em">SATB Bird</p>';
+          }
+        </script>
+      </div>
+    </div>
+
+    <canvas id="flappy" style="display: none"></canvas>
+
+    <!-- bottom padding for scrollbar, top just to add a bit of space -->
+    <div style="display: none; overflow-x: scroll; width: 95%; margin: auto" id="osmdContainer"></div>
+    <button style="display: none; float: right; padding: 10px" id="stop-game" onclick="gameStop()">Quit</button>
+
+    <!-- controls -->
+    <div class="container" id="app">
+      <div class="responsive-width">
+        <div class="tab-bar">
+          <button class="default-open tablinks" onclick="switchToTab(event, 'tab-example')">Songs</button>
+          <button class="tablinks" onclick="switchToTab(event, 'tab-musicxml')">MusicXML</button>
+          <!-- <button class="tablinks" onclick="switchToTab(event, 'tab-url')">URL</button> -->
+        </div>
+        <div id="tab-example" class="tabcontent">
+          <select onchange="loadExample(this)">
+            <option>-</option>
+            <option value="Joy_to_the_World.musicxml">Joy to the World</option>
+            <option value="If_Ye_Love_Me.musicxml">If Ye Love Me</option>
+            <option value="sicut-cervus.musicxml">Sicut Cervus</option>
+            <option value="ave-verum-corpus.musicxml">Ave Verum Corpus</option>
+            <option value="though-amaryllis-dance-in-green.musicxml">Though Amaryllis Dance in Green</option>
+            <option value="fair-phyllis.musicxml">Fair Phyllis</option>
+            <option value="chi-la-gagliarda.musicxml">Chi la Gagliarda</option>
+            <option value="tanzen-und-springen.musicxml">Tanzen und Springen</option>
+            <option value="happy-birthday.musicxml">Happy Birthday</option>
+          </select>
+        </div>
+        <div id="tab-musicxml" class="tabcontent">
+          <input accept=".musicxml" onChange="loadScoreFile(this)" type="file" />
+        </div>
+        <!-- <div id="tab-url" class="tabcontent">
+        <p>url</p>
+      </div> -->
+      </div>
+
+      <script>
+        function switchToTab(evt, tabEltId) {
+          var i, tabcontent, tablinks;
+          tabcontent = document.getElementsByClassName('tabcontent');
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = 'none';
+          }
+          tablinks = document.getElementsByClassName('tablinks');
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(' active', '');
+          }
+          document.getElementById(tabEltId).style.display = 'block';
+          evt.currentTarget.className += ' active';
+        }
+        document.querySelector('.default-open').click();
+      </script>
+
+      <div class="responsive-width" style="margin-top: 10px" id="parts-view"></div>
+      <div class="responsive-width" style="margin-bottom: 1em">
+        <label>
+          <input type="checkbox" onchange="toggleProMode(this.checked)" />
+          Pro mode
+        </label>
+      </div>
+      <div
+        class="responsive-width"
+        style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px"
+        id="pro-mode-controls"
+      >
+        <div>
+          <label style="display: none" class="pro-only">
+            <input type="checkbox" id="note-being-sung" />
+            Show note being sung
+          </label>
+        </div>
+        <div>
+          <label style="display: none" class="pro-only">
+            Synth
+            <select onchange="transposeChange()" id="synth">
+              <option value="triangle">Triangle</option>
+              <option value="sine">Sine</option>
+              <option value="sawtooth">Sawtooth</option>
+              <option value="square">Square</option>
+            </select>
+          </label>
+        </div>
+        <div>
+          <label style="display: none" class="pro-only">
+            Transpose
+            <input onchange="transposeChange()" id="transpose" type="number" min="-48" max="48" step="1" value="0" />
+          </label>
+        </div>
+        <div>
+          <label style="display: none" class="pro-only">
+            Input
+            <select id="pitch-detection-method">
+              <option value="macleod">MacLeod</option>
+              <option value="yin">YIN</option>
+              <option value="autocorrelation">Autocorrelation</option>
+              <option value="auto">Auto</option>
+              <option value="random">Random</option>
+            </select>
+          </label>
+        </div>
+        <div style="display: flex">
+          <div style="display: none" class="pro-only">
+            <fieldset style="display: inline">
+              <legend>Gameplay</legend>
+              <label
+                >Movement
+                <select id="movement-kind">
+                  <option value="precise">Precise</option>
+                  <option value="wobbly">Wobbly</option>
+                </select>
+              </label>
+            </fieldset>
+          </div>
+          <div style="display: none" class="pro-only">
+            <fieldset style="display: inline">
+              <legend>Pitch Detection</legend>
+              <!--
+          <label
+            >Clarity threshold
+            <input
+              type="range"
+              min="0"
+              max="1"
+              value="0.6"
+              step="0.01"
+              id="claritythreshold"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0.6</output>
+          </label>
+          <br />
+          -->
+              <label
+                >Window size
+                <select id="window-size">
+                  <option value="512">512</option>
+                  <option selected value="1024">1024</option>
+                  <option value="2048">2048</option>
+                  <option value="4096">4096</option>
+                </select>
+              </label>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+
+      <template id="part-container">
+        <fieldset>
+          <legend class="info"></legend>
+          <div class="info"></div>
+        </fieldset>
+      </template>
+
+      <template id="part-player">
+        <div style="margin-top: 10px; display: grid; grid-template-columns: 3fr 2fr">
+          <div style="display: inline-block">
+            <div class="name"></div>
+            <div style="font-size: 0.8em" class="info1"></div>
+            <div style="font-size: 0.8em" class="info2"></div>
+          </div>
+          <div style="vertical-align: top; display: flex; justify-content: flex-end">
+            <!-- <button data-part="" onclick="previewOnePart(this)">⏵</button> -->
+            <!-- <button data-part="" onclick="stopPreviewingParts()">⏹</button> -->
+            <!-- <input style="display: none" class="pro-only" type="checkbox" /> -->
+            <button data-part="" onclick="previewOnePart(this)">listen</button>
+            <button data-part="" onclick="stopPreviewingParts()">stop</button>
+            <button data-part="" onclick="startGame(this)">play</button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js"></script>
+
+    <script src="shaped.js"></script>
+    <script src="util.js"></script>
+
+    <!-- pitch detection -->
+    <script src="notes.js"></script>
+
+    <script type="module" src="pkg/pitch.js"></script>
+    <script src="pitch-rust.js"></script>
+
+    <!-- other libs -->
+    <script src="game.js"></script>
+    <script src="musicxml.js"></script>
+    <script src="play.js"></script>
+    <script src="osmd.js"></script>
+
+    <!-- entry -->
+    <script src="app.js"></script>
+
+    <!-- <script type="module" src="app.js"></script> -->
+
+    <!-- <script type="module" src="oscillator.js"></script> -->
+    <!-- <script type="module" src="midi.js"></script> -->
+
+    <!-- <script src = "https://bernii.github.io/gauge.js/dist/gauge.min.js"></script> -->
+
+    <!-- <script type="module">
+      import Game from './game.js';
+      import Score from './score.js';
+    </script> -->
+  </body>
+</html>
