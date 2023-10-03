@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="4.0">
-  <identification>
+ <identification>
     <creator type="composer">Oscar Grau</creator>
     <encoding>
       <software>MuseScore 4.1.1</software>
@@ -61,7 +61,7 @@
       <group-symbol>bracket</group-symbol>
       </part-group>
     <score-part id="P1">
-      <part-name>S</part-name>
+      <part-name>Soprano</part-name>
       <part-abbreviation>S</part-abbreviation>
       <score-instrument id="P1-I1">
         <instrument-name>Instrument 1</instrument-name>
@@ -76,7 +76,7 @@
         </midi-instrument>
       </score-part>
     <score-part id="P2">
-      <part-name>A</part-name>
+      <part-name>Alto</part-name>
       <part-abbreviation>A</part-abbreviation>
       <score-instrument id="P2-I1">
         <instrument-name>Instrument 2</instrument-name>
@@ -91,7 +91,7 @@
         </midi-instrument>
       </score-part>
     <score-part id="P3">
-      <part-name>T</part-name>
+      <part-name>Tenor</part-name>
       <part-abbreviation>T</part-abbreviation>
       <score-instrument id="P3-I1">
         <instrument-name>Instrument 3</instrument-name>
