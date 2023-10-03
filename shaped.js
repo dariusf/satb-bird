@@ -234,8 +234,13 @@ let { shaped, oneOf, objMap, pred, any, func, nullOr, define } = (function () {
     return new Proxy(
       {},
       {
-        get: function (_target, _name) {
-          return (obj, _pat) => obj;
+        get: function (_target, name) {
+          switch (name) {
+            case 'define':
+              return (...args) => args[args.length - 1];
+            default:
+              return (obj, _pat) => obj;
+          }
         },
       }
     );
