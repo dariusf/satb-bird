@@ -402,7 +402,10 @@ let { gameStart, handleInput } = (function () {
 
       for (let b in this.birds) {
         let bird_right = this.birds[b].x + this.birds[b].width / 2;
-        let bird_left = this.birds[b].x - this.birds[b].width / 2;
+
+        // trigger a bit in advance
+        let bird_left = this.birds[b].x - this.birds[b].width / 2 + 50;
+
         if (rightAfter <= bird_right && bird_right <= rightBefore) {
           ON_PIPE_PASSED();
         }
