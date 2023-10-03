@@ -147,7 +147,7 @@
           </clef>
         </attributes>
       <direction placement="above">
-        <sound tempo="220"/>
+        <sound tempo="240"/>
         </direction>
       <direction placement="above">
         <direction-type>
