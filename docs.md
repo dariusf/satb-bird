@@ -6,6 +6,7 @@
 cargo install wasm-pack
 (cd pitch && cargo build && wasm-pack build --target web)
 ln -snf pitch/pkg pkg
+# add pkg to .git/info/exclude (and not .gitignore)
 ```
 
 See [this example](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor#examples) for how AudioWorkletNode and AudioWorkletProcessor are related.

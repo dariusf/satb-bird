@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
 (cd pitch && cargo build && wasm-pack build --target web)
-cp pitch/pkg pkg
+cp -r pitch/pkg pkg
+rm pkg/.gitignore
+ls -lah
