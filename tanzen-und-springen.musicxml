@@ -147,8 +147,14 @@
           </clef>
         </attributes>
       <direction placement="above">
+        <direction-type>
+          <metronome parentheses="no" default-x="-38.52" relative-y="20.00">
+            <beat-unit>quarter</beat-unit>
+            <per-minute>250</per-minute>
+            </metronome>
+          </direction-type>
         <sound tempo="250"/>
-      </direction>
+        </direction>
       <direction placement="above">
         <direction-type>
           <words default-y="10.68" relative-y="10.00" font-family="Times New Roman" font-size="19">Tanzen und springen</words>

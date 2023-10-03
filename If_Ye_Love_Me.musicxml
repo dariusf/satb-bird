@@ -107,6 +107,12 @@ Editorial text repetitions are shown in italics
           </transpose>
         </attributes>
       <direction placement="above">
+        <direction-type>
+          <metronome parentheses="no" default-x="-38.52" relative-y="20.00">
+            <beat-unit>quarter</beat-unit>
+            <per-minute>200</per-minute>
+            </metronome>
+          </direction-type>
         <sound tempo="200"/>
         </direction>
       <note>

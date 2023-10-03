@@ -148,6 +148,12 @@
           </clef>
         </attributes>
       <direction placement="above">
+        <direction-type>
+          <metronome parentheses="no" default-x="-38.52" relative-y="20.00">
+            <beat-unit>quarter</beat-unit>
+            <per-minute>220</per-minute>
+            </metronome>
+          </direction-type>
         <sound tempo="220"/>
         </direction>
       <note default-x="101.54" default-y="-35.00">

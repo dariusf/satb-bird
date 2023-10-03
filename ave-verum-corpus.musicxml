@@ -173,16 +173,13 @@ Edition may be freely distributed, duplicated, performed, or recorded. All other
           </clef>
         </attributes>
       <direction placement="above">
-        <sound tempo="90"/>
-      </direction>
-      <direction placement="below">
         <direction-type>
           <metronome parentheses="no" default-x="-38.52" default-y="-98.26" relative-y="-30.00">
             <beat-unit>quarter</beat-unit>
-            <per-minute>60</per-minute>
+            <per-minute>90</per-minute>
             </metronome>
           </direction-type>
-        <sound tempo="60"/>
+        <sound tempo="90"/>
         </direction>
       <direction placement="below">
         <direction-type>
