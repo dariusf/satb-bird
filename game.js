@@ -7,6 +7,7 @@ let { gameStart, handleInput } = (function () {
   var ON_PIPE_PASSED = () => {};
   var ON_PIPE_ENCOUNTERED = () => {};
 
+  let SHOW_NOTE_BEING_SUNG;
   let AI_ENABLED;
   let MOVEMENT_KIND;
 
@@ -556,7 +557,7 @@ let { gameStart, handleInput } = (function () {
         this.ctx.translate(this.birds[i].x + this.birds[i].width / 2, this.birds[i].y + this.birds[i].height / 2);
 
         // draw note, while we're at bird position
-        if (flappyNote) {
+        if (SHOW_NOTE_BEING_SUNG && flappyNote) {
           this.ctx.save();
           this.ctx.fillStyle = '#000';
           this.ctx.font = '25px ui-rounded, sans-serif';
@@ -604,9 +605,20 @@ let { gameStart, handleInput } = (function () {
     });
   };
 
-  function gameStart({ randomPipes, part, onEnd, onStart, ai, movement, onPipePassed, onPipeEncountered }) {
+  function gameStart({
+    randomPipes,
+    part,
+    onEnd,
+    onStart,
+    ai,
+    movement,
+    onPipePassed,
+    onPipeEncountered,
+    noteBeingSung,
+  }) {
     AI_ENABLED = ai;
     MOVEMENT_KIND = movement;
+    SHOW_NOTE_BEING_SUNG = noteBeingSung;
     DEFAULT_RANDOM_PIPES = randomPipes;
     ON_END = onEnd;
     ON_START = onStart;

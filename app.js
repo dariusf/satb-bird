@@ -168,6 +168,7 @@
         }
         OSMD.next();
       },
+      noteBeingSung: noteBeingSung(),
     });
 
     Play.parts(score, Object.keys(score.parts), bird_delay, btn.dataset.part);
@@ -249,5 +250,9 @@
 
   function movementKind() {
     return document.querySelector('select#movement-kind').value;
+  }
+
+  function noteBeingSung() {
+    return document.querySelector('input#note-being-sung').checked;
   }
 })();
